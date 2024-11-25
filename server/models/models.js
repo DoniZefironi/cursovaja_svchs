@@ -20,6 +20,7 @@ const Subject = sequelize.define('subject', {
 const Syllabus = sequelize.define('syllabus', {
     id: {type : DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     date: {type : DataTypes.DATE, allowNull: false},
+    syllfile: {type : DataTypes.STRING, allowNull: false},
 })
 
 const Form_study = sequelize.define('form_study', {

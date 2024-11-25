@@ -3,8 +3,8 @@ const ApiError = require('../error/ApiError')
 
 class SubjectController {
     async create(req, res) {
-        const { name, description } = req.body;
-        const subject = await Subject.create({name, description});
+        const { name, description, syllabusId } = req.body;
+        const subject = await Subject.create({name, description, syllabusId});
         return res.json(subject);
     }
 

@@ -3,9 +3,9 @@ const ApiError = require('../error/ApiError')
 
 class MethodController {
     async create(req, res) {
-        const { code, qualification } = req.body;
-        const speciality = await Speciality.create({code, qualification});
-        return res.json(speciality);
+        const { title, description, language, year_create, url, quantity_pages, subjectId, TypeMethodId } = req.body;
+        const met = await Methodological_rec.create({title, description, language, year_create, url, quantity_pages, subjectId, TypeMethodId});
+        return res.json(met);
     }
 
     async getAll(req, res) {
