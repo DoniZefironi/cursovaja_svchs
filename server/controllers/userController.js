@@ -1,5 +1,6 @@
-const {User} = require('../models/models')
 const ApiError = require('../error/ApiError');
+const bcrypt = require('bcrypt')
+const {User, Subject} = require('../models/models')
 
 class UserController {
     async create(req, res) {
@@ -13,11 +14,18 @@ class UserController {
     }
 
     async check(req, res, next) {
-        const {id} = req.query
-        if (!id){
-            return next(ApiError.bodRequest('Не задан ID'))
-        }
-        res.json(id);
+        const {id} = req.params
+        const user = await User.findOne(
+            {
+                where: {id},
+                include: [
+                    { model: PhoneNumber, as: 'phone_number' },
+                    { model: Email, as: 'email' },
+                    { model: Roles, as: 'roles' }
+                ]
+            },
+        )
+        return res.json(user)
     }
 
     async getall(req, res){

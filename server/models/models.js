@@ -1,6 +1,11 @@
 const sequelize = require('../db')
 const {DataTypes} = require('sequelize')
 
+const Refresh_Token = sequelize.define('refresh_token', {
+    id_user: {type: DataTypes.INTEGER, primaryKey: true, references: { model: User, key: 'id' }},
+    refresh_token: {type: DataTypes.STRING, allowNull: false},
+})
+
 const User = sequelize.define('user', {
     id: {type : DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type : DataTypes.STRING, allowNull: false},
@@ -70,6 +75,9 @@ Speciality.belongsTo(Form_study)
 Subject.hasOne(Methodological_rec)
 Methodological_rec.belongsTo(Subject)
 
+User.hasOne(Refresh_Token, {foreignKey: 'id_user',sourceKey: 'id'});
+Refresh_Token.belongsTo(User, { foreignKey: 'id_user',targetKey: 'id'});
+
 Methodological_rec.belongsToMany(User, {through: User_methodological})
 User.belongsToMany(Methodological_rec, {through: User_methodological})
 
@@ -85,5 +93,6 @@ module.exports = {
     Speciality,
     Methodological_rec,
     User_methodological,
-    Speciality_method
+    Speciality_method,
+    Refresh_Token
 }

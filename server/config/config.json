@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "44504450",
+    "database": "metrec_cursovaja",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "44504450",
+    "database": "metrec_cursovaja",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "44504450",
+    "database": "metrec_cursovaja",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}

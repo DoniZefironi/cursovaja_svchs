@@ -9,13 +9,16 @@ class SubjectController {
     }
 
     async getAll(req, res) {
-        const {syllabusId} = req.body;
+        let {syllabusId, limit, page} = req.query;
+        page = page || 1
+        limit = limit || 9
+        let offset = page * limit - limit
         let subject;
         if (!syllabusId) {
-            subject = await Subject.findAll()
+            subject = await Subject.findAndCountAll({limit, offset})
         }
         if (syllabusId) {
-            subject = await Subject.findAll({where:{syllabusId}})
+            subject = await Subject.findAndCountAll({where:{syllabusId}, limit, offset})
         }
         return res.json(subject)
     }
