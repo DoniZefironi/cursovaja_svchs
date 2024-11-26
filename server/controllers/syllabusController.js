@@ -35,11 +35,27 @@ class SyllabusController {
     }
 
     async getOne(req, res) {
-
+        const {id} = req.query
+        if (!id){
+            return next(ApiError.bodRequest('Не задан ID'))
+        }
+        res.json(id);
     }
 
     async deleteOne(req, res) {
-
+        const { id } = req.params;
+        
+        try {
+            const syllabus = await Syllabus.findByPk(id);
+            if (!syllabus) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            
+            await syllabus.destroy();
+            return res.json({ message: 'User deleted successfully' });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to delete user' });
+        }
     }
 }
 

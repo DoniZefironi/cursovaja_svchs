@@ -24,6 +24,22 @@ class UserController {
         const users = await User.findAll()
         return res.json(users)
     }
+
+    async delete(req, res) {
+        const { id } = req.params;
+        
+        try {
+            const user = await User.findByPk(id);
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            
+            await user.destroy();
+            return res.json({ message: 'User deleted successfully' });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to delete user' });
+        }
+    }
 }
 
 module.exports = new UserController()
