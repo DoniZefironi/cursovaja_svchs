@@ -5,12 +5,13 @@ const ApiError = require('../error/ApiError')
 
 class SyllabusController {
     async create(req, res) {
-        const { date } = req.body;
-        const { syllfile } = req.files
-        let fileName = uuid.v4() + ".pdf"
-        syllfile.mv(path.resolve(__dirname, '..', 'static', fileName))
-        const syllabus = await Syllabus.create({date, syllfile: fileName});
-        return res.json(syllabus);
+            const { date } = req.body;
+            const { syllfile } = req.files
+            let fileName = uuid.v4() + ".png"
+            syllfile.mv(path.resolve(__dirname, '..', 'static', fileName))
+            const syllabus = await Syllabus.create({date, syllfile: fileName})
+            return res.json(syllabus)
+
     }
 
     async getAll(req, res) {

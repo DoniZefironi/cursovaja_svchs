@@ -9,7 +9,15 @@ class SubjectController {
     }
 
     async getAll(req, res) {
-        
+        const {syllabusId} = req.body;
+        let subject;
+        if (!syllabusId) {
+            subject = await Subject.findAll()
+        }
+        if (syllabusId) {
+            subject = await Subject.findAll({where:{syllabusId}})
+        }
+        return res.json(subject)
     }
 
     async getOne(req, res) {
