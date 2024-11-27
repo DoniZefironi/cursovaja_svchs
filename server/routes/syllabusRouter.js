@@ -1,10 +1,12 @@
-const Router = require('express')
-const router = new Router()
-const syllabusController = require('../controllers/syllabusController')
+const express = require('express');
+const router = express.Router();
+const syllabusController = require('../controllers/syllabusController');
 
-router.post('/create', syllabusController.create)
-router.get('/getAll', syllabusController.getAll)
-router.get('/getOne/:id', syllabusController.getOne)
-router.delete('/deleteOne/:id', syllabusController.deleteOne)
+router.post('/create', syllabusController.create);
+router.get('/all', syllabusController.getAll);
+router.get('/one', syllabusController.getOne);
+router.put('/:id', syllabusController.updateOne);
+router.delete('/:id', syllabusController.deleteOne);
+router.get('/search', syllabusController.search);
 
-module.exports = router
+module.exports = router;

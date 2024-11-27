@@ -1,11 +1,6 @@
 const sequelize = require('../db')
 const {DataTypes} = require('sequelize')
 
-const Refresh_Token = sequelize.define('refresh_token', {
-    id_user: {type: DataTypes.INTEGER, primaryKey: true, references: { model: User, key: 'id' }},
-    refresh_token: {type: DataTypes.STRING, allowNull: false},
-})
-
 const User = sequelize.define('user', {
     id: {type : DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type : DataTypes.STRING, allowNull: false},
@@ -14,6 +9,11 @@ const User = sequelize.define('user', {
     email: {type : DataTypes.STRING, unique: true, allowNull: false},
     password: {type : DataTypes.STRING, allowNull: false},
     roles: {type : DataTypes.STRING, defaultValue: "USER"},
+})
+
+const Refresh_Token = sequelize.define('refresh_token', {
+    id_user: {type: DataTypes.INTEGER, primaryKey: true, references: { model: User, key: 'id' }},
+    refresh_token: {type: DataTypes.STRING, allowNull: false},
 })
 
 const Subject = sequelize.define('subject', {
