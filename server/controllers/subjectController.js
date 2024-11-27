@@ -9,17 +9,40 @@ class SubjectController {
     }
 
     async getAll(req, res) {
-        let { syllabusId, limit, page } = req.query;
-        page = page || 1;
-        limit = limit || 9;
-        let offset = page * limit - limit;
-        let subject;
-        if (!syllabusId) {
-            subject = await Subject.findAndCountAll({ limit, offset });
-        } else {
-            subject = await Subject.findAndCountAll({ where: { syllabusId }, limit, offset });
+        try {
+            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
+            const offset = (page - 1) * limit;
+            const where = {};
+
+            if (search) {
+                where[Op.or] = [
+                    { name: { [Op.like]: `%${search}%` } },
+                    { description: { [Op.like]: `%${search}%` } },
+                    { syllabusId: { [Op.like]: `%${search}%` } }
+                ];
+            }
+
+            for (const key in filter) {
+                if (filter.hasOwnProperty(key)) {
+                    where[key] = filter[key];
+                }
+            }
+
+            const subjects = await Subject.findAndCountAll({
+                where,
+                limit,
+                offset,
+                order: [[sortBy, order]]
+            });
+
+            return res.json({
+                total: subjects.count,
+                pages: Math.ceil(subjects.count / limit),
+                data: subjects.rows
+            });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to retrieve subjects' });
         }
-        return res.json(subject);
     }
 
     async getOne(req, res, next) {

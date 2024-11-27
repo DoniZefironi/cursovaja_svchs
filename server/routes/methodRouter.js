@@ -2,9 +2,11 @@ const Router = require('express')
 const router = new Router()
 const methodController = require('../controllers/methodController')
 
-router.post('/create', methodController.create)
-router.get('/getAll', methodController.getAll)
-router.get('/getOne/:id', methodController.getOne)
-router.delete('/deleteOne/:id', methodController.deleteOne)
+router.post('/create', methodController.create);
+router.get('/all', methodController.getAll);
+router.get('/one', methodController.getOne);
+router.put('/:id', methodController.update);
+router.delete('/:id', methodController.deleteOne);
+router.get('/search', methodController.search);
 
 module.exports = router

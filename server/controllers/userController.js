@@ -1,6 +1,6 @@
 const ApiError = require('../error/ApiError');
 const bcrypt = require('bcrypt');
-const { User, Subject } = require('../models/models');
+const { User } = require('../models/models');
 const { Op } = require('sequelize');
 
 class UserController {

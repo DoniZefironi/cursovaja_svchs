@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const path = require('path');
 const { Syllabus } = require('../models/models');
 const ApiError = require('../error/ApiError');
+const { Op } = require('sequelize');
 
 class SyllabusController {
     async create(req, res, next) {
@@ -25,13 +26,43 @@ class SyllabusController {
             const syllabus = await Syllabus.create({ date, syllfile: fileName });
             return res.json(syllabus);
         } catch (err) {
-            return next(ApiError.internal(err.message));
+            return res.status(500).json({ error: 'Failed to create syllabus' });
         }
     }
 
     async getAll(req, res) {
-        const syllabus = await Syllabus.findAll();
-        return res.json(syllabus);
+        try {
+            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
+            const offset = (page - 1) * limit;
+            const where = {};
+
+            if (search) {
+                where[Op.or] = [
+                    { date: { [Op.like]: `%${search}%` } }
+                ];
+            }
+
+            for (const key in filter) {
+                if (filter.hasOwnProperty(key)) {
+                    where[key] = filter[key];
+                }
+            }
+
+            const syllabuses = await Syllabus.findAndCountAll({
+                where,
+                limit,
+                offset,
+                order: [[sortBy, order]]
+            });
+
+            return res.json({
+                total: syllabuses.count,
+                pages: Math.ceil(syllabuses.count / limit),
+                data: syllabuses.rows
+            });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to retrieve syllabuses' });
+        }
     }
 
     async getOne(req, res, next) {
