@@ -2,17 +2,43 @@ const ApiError = require('../error/ApiError');
 const bcrypt = require('bcrypt');
 const { User } = require('../models/models');
 const { Op } = require('sequelize');
+const UserService = require('../service/user-service');
 
 class UserController {
-    async create(req, res) {
-        try {
-            const { name, surname, phone_number, email, password, roles } = req.body;
-            const user = await User.create({ name, surname, phone_number, email, password, roles });
-            return res.json(user);
-        } catch (error) {
-            return res.status(500).json({ error: 'Failed to create user' });
+
+        async create(req, res) {
+            try {
+                const { name, surname, phone_number, email, password, roles } = req.body;
+    
+                // Проверка на заполненность полей
+                if (!name || !surname || !phone_number || !email || !password || !roles) {
+                    return res.status(400).json({ error: 'All fields are required' });
+                }
+    
+                // Хеширование пароля перед сохранением
+                const hashedPassword = await bcrypt.hash(password, 10);
+    
+                // Попробуем создать пользователя
+                const user = await UserService.registration({ 
+                    name, 
+                    surname, 
+                    phone_number, 
+                    email, 
+                    password: hashedPassword, 
+                    roles 
+                });
+    
+                // Логирование данных пользователя
+                console.log('User created successfully:', user);
+    
+                res.cookie('refreshToken', user.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+                return res.json(user);
+            } catch (error) {
+                console.error('Error creating user:', error);
+                return res.status(500).json({ error: 'Failed to create user', details: error.message });
+            }
         }
-    }
+    
 
     async getAll(req, res) {
         try {
@@ -105,6 +131,30 @@ class UserController {
             return res.json({ message: 'User exists' });
         } catch (error) {
             return res.status(500).json({ error: 'Failed to check user existence' });
+        }
+    }
+
+    async login(req,res,next) {
+        try{
+
+        } catch(e){
+
+        }
+    }
+
+    async refresh(req,res,next) {
+        try{
+
+        } catch(e){
+            
+        }
+    }
+
+    async logout(req,res,next) {
+        try{
+
+        } catch(e){
+            
         }
     }
 }
