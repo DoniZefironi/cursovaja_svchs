@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { authRoutes } from '../routes';
+import { authRoutes, adminRoutes, publicRoutes } from '../routes';
 import {Context} from "../index";
 import {MAIN_ROUTE} from "../utils/consts";
 

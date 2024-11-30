@@ -1,10 +1,10 @@
 
-import UserList from './components/UserList';
-import Method from './components/Method';
-import Subject from './components/Subject';
-import Syllabus from './components/Syllabus';
-import Main from './components/Main';
-import Login from './components/Login';
+import UserList from './pages/UsersList';
+import Method from './pages/Method';
+import Subject from './pages/Subject';
+import Syllabus from './pages/Syllabus';
+import Main from './pages/Main';
+import Login from './pages/Auth';
 import {
     USERLIST_ROUTE,
     METHOD_ROUTE,
