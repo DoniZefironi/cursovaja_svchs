@@ -1,0 +1,7 @@
+export const ADMIN_ROUTE = '/admin'
+export const LOGIN_ROUTE = '/login'
+export const METHOD_ROUTE = '/method'
+export const SUBJECT_ROUTE = '/subject'
+export const SYLLABUS_ROUTE = '/syllabus'
+export const USERLIST_ROUTE = '/userlist'
+export const MAIN_ROUTE = '/main'
