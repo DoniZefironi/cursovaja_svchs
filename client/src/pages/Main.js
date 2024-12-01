@@ -7,6 +7,12 @@ import profileicon from '../images/icon.png'
 import met from '../images/met.png'
 import sub from '../images/subject.png'
 import syb from '../images/syllabus.png'
+import bib from '../images/biblio.png'
+import caf from '../images/cafedra.png'
+import geo from '../images/geo.png'
+import sms from '../images/sms.png'
+import tel from '../images/tel.png'
+import unic from '../images/unic.png'
 
 const Main = () => {
     return (
@@ -45,28 +51,28 @@ const Main = () => {
                 </Container>
             </Navbar>
 
-          <Container className="mt-4">
-          <Row className="mb-4">
-          <Col md={8} className="mb-4">
+          <Container className="mt-4 main">
+          <Row className="mb-4 wrap">
+          <Col md={8} className="mb-4 wap">
             <div className="content-box">
               <h3>Методические рекомендации</h3>
               <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
               <Button variant="light" className="custom-button">Рекомендации</Button>
             </div>
           </Col>
-          <Col md={4} className="mb-4">
+          <Col md={4} className="mb-4 wap wapnone">
             <div className="content-box-img">
               <img src={met} alt="Recommendation" className="img-fluid rounded" />
             </div>
           </Col>
         </Row>
-            <Row className="mb-4">
-            <Col md={4} className="mb-4">
+            <Row className="mb-4 wrap">
+            <Col md={4} className="mb-4 wap wapnone">
                 <div className="content-box-img">
                   <img src={sub} alt="Disciplines" className="img-fluid" />
                 </div>
               </Col>
-              <Col md={8} className="mb-4">
+              <Col md={8} className="mb-4 wap">
                 <div className="content-box">
                   <h3>Дисциплины</h3>
                   <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
@@ -74,15 +80,15 @@ const Main = () => {
                 </div>
               </Col>
             </Row>
-            <Row className="mb-4">
-            <Col md={8} className="mb-4">
+            <Row className="mb-4 wrap">
+            <Col md={8} className="mb-4 wap">
                 <div className="content-box">
                   <h3>Учебные планы</h3>
                   <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
                   <Button variant="light" className="custom-button">Учебные планы</Button>
                 </div>
               </Col>
-              <Col md={4} className="mb-4">
+              <Col md={4} className="mb-4 wap wapnone">
                 <div className="content-box-img">
                   <img src={syb} alt="Report" className="img-fluid" />
                 </div>
@@ -96,9 +102,9 @@ const Main = () => {
             <Col md={4}>
               <h5>Полезные ссылки</h5>
               <ul className="list-unstyled">
-                <li><a href="#link1" className="text-white"><FaUniversity /> Link 1</a></li>
-                <li><a href="#link2" className="text-white"><FaBuilding /> Link 2</a></li>
-                <li><a href="#link3" className="text-white"><FaChalkboardTeacher /> Link 3</a></li>
+              <li><a href="#link1" className="text-white"><img src={unic} alt="Report" className="img-fluid" /></a></li>
+                <li><a href="#link2" className="text-white"><img src={caf} alt="Report" className="img-fluid" /></a></li>
+                <li><a href="#link3" className="text-white"><img src={bib} alt="Report" className="img-fluid" /></a></li>
               </ul>
             </Col>
             <Col md={4}>
@@ -109,9 +115,9 @@ const Main = () => {
             </Col>
             <Col md={4}>
               <h5>Контакты</h5>
-              <p><FaMapMarkerAlt /> г. Могилев, ул. Ленинская 89, ауд. 322, корпус №2</p>
-              <p><FaPhone /> +375-22-629-447</p>
-              <p><FaEnvelope /> poit@bru.by</p>
+              <p><img src={geo} alt="Report" className="img-fluid" /> г. Могилев, ул. Ленинская 89, ауд. 322, корпус №2</p>
+              <p><img src={tel} alt="Report" className="img-fluid" /> +375-22-629-447</p>
+              <p><img src={sms} alt="Report" className="img-fluid" /> poit@bru.by</p>
             </Col>
           </Row>
         </Container>

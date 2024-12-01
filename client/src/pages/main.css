@@ -19,7 +19,9 @@ body {
     align-items: start;
     gap: 20px;
   }
-
+  .content-box h3{
+    text-align: start;
+  }
   .content-box-img{
     background-color: #2B579A;
     color: white;
@@ -98,4 +100,43 @@ body {
   
   footer p svg {
     margin-right: 8px;
+  }
+
+  footer .list-unstyled {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media only screen and (max-width: 1024px) {
+    .wrap{
+      flex-direction: column;
+    }
+    .wap{
+      width: 100%;
+    }
+    .content-box-img img{
+      width: 550px;
+    }
+    .main{
+      padding: 0px 60px;
+    }
+    .content-box-img {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  @media only screen and (max-width: 320px) {
+    .wapnone{
+      display: none;
+    }
+    .content-box-img img{
+      width: 550px;
+    }
+    .main{
+      padding: 0px 10px;
+    }
   }
