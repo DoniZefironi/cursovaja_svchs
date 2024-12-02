@@ -5,33 +5,67 @@ body {
   .navbar {
     margin-bottom: 20px;
   }
-  
+
   .content-box {
     background-color: #2B579A;
     color: white;
+    border-radius: 10px;
     padding: 20px;
-    border-radius: 20px;
-    text-align: center;
-    height: 100%;
+  }
+  
+  .list-box {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  
+  .list-item {
     display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: start;
-    gap: 20px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ffffff33;
   }
-  .content-box h3{
-    text-align: start;
+  
+  .list-item:last-child {
+    border-bottom: none;
   }
-  .content-box-img{
-    background-color: #2B579A;
-    color: white;
-    padding: 20px;
-    border-radius: 20px;
+  .contentiks{
     width: 100%;
   }
-  .content-box-img img{
-    width: 450px;
+  .plus-button {
+    background-color: white;
+    color: #2B579A;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+  
+  .filter-box {
+    padding: 20px;
+  }
+  
+  .filter-section h5,
+  .report-section h5 {
+    margin-bottom: 15px;
+  }
+  
+  .filter-section select,
+  .report-section button {
+    width: 100%;
+  }
+  
+  .download-button {
+    background-color: white;
+    color: #2B579A;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
   .link-p{
     font-size: 24px;
     margin-left: 10px;
@@ -43,14 +77,6 @@ body {
     justify-content: center;
     align-items: center;
     gap: 20px;
-  }
-  .content-box p{
-    text-align: start;
-    font-size: 24px;
-  }
-
-  .content-box img {
-    border-radius: 20px;
   }
   
   .custom-button {
@@ -115,33 +141,9 @@ body {
   }
 
   @media only screen and (max-width: 1024px) {
-    .wrap{
-      flex-direction: column;
-    }
-    .wap{
-      width: 100%;
-    }
-    .content-box-img img{
-      width: 550px;
-    }
-    .main{
-      padding: 0px 60px;
-    }
-    .content-box-img {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+
   }
 
   @media only screen and (max-width: 320px) {
-    .wapnone{
-      display: none;
-    }
-    .content-box-img img{
-      width: 550px;
-    }
-    .main{
-      padding: 0px 10px;
-    }
+
   }

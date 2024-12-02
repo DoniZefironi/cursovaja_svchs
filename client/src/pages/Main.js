@@ -115,9 +115,18 @@ const Main = () => {
             </Col>
             <Col md={4}>
               <h5>Контакты</h5>
-              <p><img src={geo} alt="Report" className="img-fluid" /> г. Могилев, ул. Ленинская 89, ауд. 322, корпус №2</p>
-              <p><img src={tel} alt="Report" className="img-fluid" /> +375-22-629-447</p>
-              <p><img src={sms} alt="Report" className="img-fluid" /> poit@bru.by</p>
+              <div className="blockimg">
+              <img src={geo} alt="Report" className="img-fluid" />
+              <a>г. Могилев, ул. Ленинская 89, ауд. 322, корпус №2</a>
+              </div>
+              <div className="blockimg">
+              <img src={tel} alt="Report" className="img-fluid" />
+              <a> +375-22-629-447</a>
+              </div>
+              <div className="blockimg">
+              <img src={sms} alt="Report" className="img-fluid" />
+              <a>poit@bru.by</a>
+              </div>
             </Col>
           </Row>
         </Container>
