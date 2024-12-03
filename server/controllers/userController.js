@@ -2,43 +2,10 @@ const ApiError = require('../error/ApiError');
 const bcrypt = require('bcrypt');
 const { User } = require('../models/models');
 const { Op } = require('sequelize');
-const UserService = require('../service/user-service');
+const {validationResult } = require('express-validator');
+const userService = require('../service/user-service');
 
 class UserController {
-
-        async create(req, res) {
-            try {
-                const { name, surname, phone_number, email, password, roles } = req.body;
-    
-                // Проверка на заполненность полей
-                if (!name || !surname || !phone_number || !email || !password || !roles) {
-                    return res.status(400).json({ error: 'All fields are required' });
-                }
-    
-                // Хеширование пароля перед сохранением
-                const hashedPassword = await bcrypt.hash(password, 10);
-    
-                // Попробуем создать пользователя
-                const user = await UserService.registration({ 
-                    name, 
-                    surname, 
-                    phone_number, 
-                    email, 
-                    password: hashedPassword, 
-                    roles 
-                });
-    
-                // Логирование данных пользователя
-                console.log('User created successfully:', user);
-    
-                res.cookie('refreshToken', user.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-                return res.json(user);
-            } catch (error) {
-                console.error('Error creating user:', error);
-                return res.status(500).json({ error: 'Failed to create user', details: error.message });
-            }
-        }
-    
 
     async getAll(req, res) {
         try {
@@ -134,27 +101,55 @@ class UserController {
         }
     }
 
-    async login(req,res,next) {
-        try{
-
-        } catch(e){
-
+    async registration(req, res, next) {
+        try {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) {
+                return next(ApiError.badRequest("Ошибка валидации",errors.array()));
+            }
+            const { email, password, name, surname, adress, role } = req.body;
+            const userData = await userService.register(email, password, name, surname, adress, role);
+            res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            return res.json(userData);
+        } catch (e) {
+            console.error(e);
+            next(ApiError.Internal(e.message));  // Передаем ошибку в обработчик ошибок
         }
     }
 
-    async refresh(req,res,next) {
-        try{
-
-        } catch(e){
-            
+    async login(req, res, next) {
+        try {
+            const { email, password} = req.body;
+            const userData = await userService.login(email, password);
+            res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            return res.json(userData);
+        } catch (e) {
+            console.error(e);
+            next(ApiError.Internal(e.message)); // Передаем ошибку в обработчик
         }
     }
 
-    async logout(req,res,next) {
-        try{
+    async logout(req, res, next) {
+        try {
+            const {refreshToken} = req.cookies;
+            const token = await  userService.logout(refreshToken)
+            res.clearCookie('refreshToken');
+            return res.json(token)
+        } catch (e) {
+            console.error(e);
+            next(ApiError.Internal(e.message)); // Передаем ошибку в обработчик
+        }
+    }
 
-        } catch(e){
-            
+    async refresh(req, res, next) {
+        try {
+            const {refreshToken} = req.cookies;
+            const userData = await  userService.refresh(refreshToken)
+            res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            return res.json(userData)
+        } catch (e) {
+            console.error(e);
+            next(ApiError.Internal(e.message)); // Передаем ошибку в обработчик
         }
     }
 }
