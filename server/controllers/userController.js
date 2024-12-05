@@ -91,12 +91,17 @@ class UserController {
     async checkExistence(req, res) {
         try {
             const { email } = req.query;
+            if (!email) {
+                return res.status(400).json({ error: 'Email is required' });
+            }
+            console.log(`Checking existence for email: ${email}`);
             const user = await User.findOne({ where: { email } });
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
             return res.json({ message: 'User exists' });
         } catch (error) {
+            console.error('Error checking user existence:', error);
             return res.status(500).json({ error: 'Failed to check user existence' });
         }
     }
