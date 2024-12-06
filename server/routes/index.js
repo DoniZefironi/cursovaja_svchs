@@ -14,7 +14,7 @@ const syllabusRouter = require('./syllabusRouter')
 router.use('/user', userRouter)
 router.use('/method', methodRouter)
 router.use('/speciality', specialityRouter)
-router.use('/subject', subjectRouter)
+router.use('/subject', subjectRouter);
 router.use('/syllabus', syllabusRouter)
 // router.use('/form_study', form_studiesRouter)
 // router.use('/speciality_method', speciality_methodsRouter)

@@ -1,5 +1,6 @@
 const { Subject } = require('../models/models');
 const ApiError = require('../error/ApiError');
+const { Op } = require('sequelize');
 
 class SubjectController {
     async create(req, res) {
@@ -35,15 +36,19 @@ class SubjectController {
                 order: [[sortBy, order]]
             });
 
+            console.log("Subjects fetched from database:", subjects.rows); 
+
             return res.json({
                 total: subjects.count,
                 pages: Math.ceil(subjects.count / limit),
                 data: subjects.rows
             });
         } catch (error) {
+            console.error("Error retrieving subjects:", error);
             return res.status(500).json({ error: 'Failed to retrieve subjects' });
         }
     }
+  
 
     async getOne(req, res, next) {
         const { id } = req.query;
@@ -75,32 +80,36 @@ class SubjectController {
             return next(ApiError.internal(err.message));
         }
     }
-
-    async search(req, res, next) {
-        try {
-            const { query } = req.query;
-            if (!query) {
-                return next(ApiError.badRequest('Search query not provided'));
-            }
-
-            const subjects = await Subject.findAll({
-                where: {
-                    [Op.or]: [
-                        { name: { [Op.like]: `%${query}%` } },
-                        { description: { [Op.like]: `%${query}%` } }
-                    ]
+    
+        async search(req, res, next) {
+            try {
+                console.log("Received search request with query:", req.query);
+                const { query } = req.query;
+                if (!query) {
+                    return next(ApiError.badRequest('Search query not provided'));
                 }
-            });
-
-            if (subjects.length === 0) {
-                return next(ApiError.notFound('No subjects found matching the query'));
+    
+                const subjects = await Subject.findAll({
+                    where: {
+                        [Op.or]: [
+                            { name: { [Op.like]: `%${query}%` } },
+                            { description: { [Op.like]: `%${query}%` } }
+                        ]
+                    }
+                });
+    
+                if (subjects.length === 0) {
+                    return res.status(404).json({ message: 'No subjects found matching the query' });
+                }
+    
+                console.log("Search results:", subjects); // Логирование результатов поиска
+                return res.json(subjects);
+            } catch (err) {
+                console.error('Error during search:', err);
+                return next(ApiError.internal(err.message));
             }
-
-            return res.json(subjects);
-        } catch (err) {
-            return next(ApiError.internal(err.message));
         }
-    }
+    
 
     async deleteOne(req, res) {
         const { id } = req.params;

@@ -4,6 +4,8 @@ const { User } = require('../models/models');
 const { Op } = require('sequelize');
 const {validationResult } = require('express-validator');
 const userService = require('../service/user-service');
+const tokenService = require("../service/token-service");
+const UserDto = require("../dtos/user-dtos");
 
 class UserController {
 
@@ -154,7 +156,7 @@ class UserController {
             return res.json(userData)
         } catch (e) {
             console.error(e);
-            next(ApiError.Internal(e.message)); // Передаем ошибку в обработчик
+            next(ApiError.Internal(e.message));
         }
     }
 }

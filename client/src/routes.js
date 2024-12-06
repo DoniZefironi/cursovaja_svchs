@@ -1,9 +1,8 @@
-
-import UserList from './pages/UsersList';
-import Method from './pages/Method';
-import Subject from './pages/Subject';
-import Syllabus from './pages/Syllabus';
-import Main from './pages/Main';
+import UserList from './pages/UserList/UsersList';
+import Method from './pages/Method/Method';
+import Subject from './pages/Subject/Subject';
+import Syllabus from './pages/Syllabus/Syllabus';
+import Main from './pages/Main/Main';
 import Login from './pages/Auth';
 import {
     USERLIST_ROUTE,

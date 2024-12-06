@@ -1,8 +1,9 @@
 const { User } = require("../models/models");
 const tokenService = require("./token-service");
 const ApiError = require("../error/ApiError");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcryptjs");
 const UserDto = require("../dtos/user-dtos")
+
 
 
 class UserService {
@@ -13,7 +14,7 @@ class UserService {
      throw new Error(`User with email ${email} already exists`);
     }
     const hashPassword = await bcrypt.hash(password, 3);
-    const user = await User.create({email,password: hashPassword,name,surname,phone_number,roles});
+    const user = await User.create({email, password: hashPassword,name,surname,phone_number,roles});
 
     const userDto = new UserDto(user);
     const tokens = tokenService.generateToken({...userDto});

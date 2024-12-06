@@ -21,7 +21,7 @@ generateToken(payload) {
    }
     validateRefreshToken(refreshToken){
         try{
-            const userData = jwt.verify(refreshToken, process.env.JWT_ACCESS_SECRET);
+            const userData = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             return userData;
         }
         catch(err){
