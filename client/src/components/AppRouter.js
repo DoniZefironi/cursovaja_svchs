@@ -1,9 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { adminRoutes, authRoutes, publicRoutes } from '../routes'; // Обновите путь
+import { adminRoutes, authRoutes, publicRoutes } from '../routes'; 
 import { useContext } from 'react';
 import { Context } from '../index';
-import { LOGIN_ROUTE } from '../utils/consts'; // Импортируйте LOGIN_ROUTE
+import { LOGIN_ROUTE } from '../utils/consts'; 
 
 const AppRouter = () => {
     const { user } = useContext(Context);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom'; // Импортируйте Outlet
+import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom'; 
 import AppRouter from './components/AppRouter';
 import Header from './components/header';
 import Footer from './components/footer';
@@ -21,7 +21,7 @@ const App = () => {
 const Layout = () => (
   <>
     <Header />
-    <Outlet /> {/* Используем Outlet для рендеринга дочерних компонентов */}
+    <Outlet /> {}
     <Footer />
   </>
 );

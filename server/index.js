@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(fileUpload());
 app.use(express.static(path.resolve(__dirname, 'static')));
-app.use('/api', router); // Проверьте, что этот маршрут правильно настроен
+app.use('/api', router); 
 
 app.use(errorHandler);
 

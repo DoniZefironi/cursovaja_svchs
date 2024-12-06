@@ -120,21 +120,24 @@ class UserController {
             return res.json(userData);
         } catch (e) {
             console.error(e);
-            next(ApiError.Internal(e.message));  // Передаем ошибку в обработчик ошибок
+            next(ApiError.Internal(e.message));  
         }
     }
 
     async login(req, res, next) {
         try {
-            const { email, password} = req.body;
+            const { email, password } = req.body;
+            console.log("Login request data:", { email, password }); // Логирование данных запроса
             const userData = await userService.login(email, password);
+            console.log("User data after login:", userData); // Логирование данных пользователя после входа
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             return res.json(userData);
         } catch (e) {
-            console.error(e);
-            next(ApiError.Internal(e.message)); // Передаем ошибку в обработчик
+            console.error("Login error:", e); // Логирование ошибки входа
+            next(ApiError.Internal(e.message)); 
         }
     }
+    
 
     async logout(req, res, next) {
         try {
@@ -144,7 +147,7 @@ class UserController {
             return res.json(token)
         } catch (e) {
             console.error(e);
-            next(ApiError.Internal(e.message)); // Передаем ошибку в обработчик
+            next(ApiError.Internal(e.message)); 
         }
     }
 

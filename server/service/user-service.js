@@ -21,22 +21,23 @@ class UserService {
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return {...tokens, user: userDto}
     }
-    async login(email, password)
-    {
-        const user = await User.findOne({where:{email}})
+    async login(email, password) {
+        const user = await User.findOne({ where: { email } });
         if (!user) {
             throw ApiError.badRequest("User not found");
         }
         const isPassEqual = await bcrypt.compare(password, user.password);
-        if(!isPassEqual){
+        if (!isPassEqual) {
             throw ApiError.badRequest("Неверный пароль");
         }
         const userDto = new UserDto(user);
-        const tokens = tokenService.generateToken({...userDto});
-
+        const tokens = tokenService.generateToken({ ...userDto });
+    
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
-        return {...tokens, user: userDto}
+        console.log("Generated tokens:", tokens); // Логирование токенов
+        return { ...tokens, user: userDto };
     }
+    
     async logout(refreshToken) {
         const token = await tokenService.removeToken(refreshToken);
         return token;
