@@ -127,13 +127,13 @@ class UserController {
     async login(req, res, next) {
         try {
             const { email, password } = req.body;
-            console.log("Login request data:", { email, password }); // Логирование данных запроса
+            console.log("Login request data:", { email, password }); 
             const userData = await userService.login(email, password);
-            console.log("User data after login:", userData); // Логирование данных пользователя после входа
+            console.log("User data after login:", userData);
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             return res.json(userData);
         } catch (e) {
-            console.error("Login error:", e); // Логирование ошибки входа
+            console.error("Login error:", e);
             next(ApiError.Internal(e.message)); 
         }
     }
@@ -153,15 +153,22 @@ class UserController {
 
     async refresh(req, res, next) {
         try {
-            const {refreshToken} = req.cookies;
-            const userData = await  userService.refresh(refreshToken)
+            const { refreshToken } = req.cookies;
+            if (!refreshToken) {
+                throw ApiError.unauthorized("Refresh token not provided");
+            }
+            console.log("Received refresh token:", refreshToken); // Логирование полученного токена
+            const userData = await userService.refresh(refreshToken);
+            console.log("User data after refresh:", userData); // Логирование данных пользователя после обновления
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-            return res.json(userData)
+            return res.json(userData);
         } catch (e) {
-            console.error(e);
+            console.error("Refresh error:", e); // Логирование ошибки обновления
             next(ApiError.Internal(e.message));
         }
     }
+    
+    
 }
 
 module.exports = new UserController();

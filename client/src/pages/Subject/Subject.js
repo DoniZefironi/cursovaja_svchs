@@ -38,11 +38,11 @@ const Subject = observer(() => {
   };
 
   return (
-    <div>
+    <div className='main'>
       <Container className="mt-4">
-        <Row>
+        <Row className='gapchek'>
           <Col md={8}>
-            <div className="content-box list-box">
+            <div className="content-box list-box width100">
               {subjects && subjects.length > 0 ? (
                 subjects.map((item, index) => (
                   <div key={index} className="contentiks">

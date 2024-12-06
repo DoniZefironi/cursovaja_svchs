@@ -23,7 +23,11 @@ const Auth = () => {
     try {
       const decodedToken = await login(email, password);
       console.log("Decoded token in Auth component:", decodedToken);
-      user.setUser(decodedToken);
+      user.setUser({
+        email: decodedToken.email,
+        name: decodedToken.name,
+        surname: decodedToken.surname,
+      });
       user.setIsAuth(true);
       navigate(MAIN_ROUTE);
     } catch (error) {

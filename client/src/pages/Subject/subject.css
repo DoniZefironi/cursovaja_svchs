@@ -1,7 +1,9 @@
 body {
     background-color: #E2F2FE;
   }
-  
+  .main{
+    min-height: 560px;
+  }
   .navbar {
     margin-bottom: 20px;
   }
@@ -18,7 +20,6 @@ body {
     align-items: center;
     gap: 20px;
   }
-  
   .custom-button {
     background-color: white;
     color: black;
@@ -80,10 +81,44 @@ body {
     gap: 20px;
   }
 
-  @media only screen and (max-width: 1024px) {
-
+  @media only screen and (max-width: 768px) {
+    .gapchek{
+      gap: 40px;
+      display: flex;
+      flex-direction: column-reverse;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+    .col-md-8 {
+      width: 100%;
+    }
+    .col-md-4 {
+      width: 50%;
+    }
   }
-
-  @media only screen and (max-width: 320px) {
+  @media only screen and (max-width: 620px) {
+    .col-md-8 {
+      width: 100%;
+    }
+    .col-md-4 {
+      width: 100%;
+    }
+    .mt-4{
+      width: 120%;
+      display: flex;
+      justify-content: center;
+    }
+  }
+  @media only screen and (max-width: 380px) {
+    .col-md-8 {
+      width: 100%;
+    }
+    .col-md-4 {
+      width: 100%;
+    }
+    .mt-4{
+      width: 100%;
+    }
 
   }
