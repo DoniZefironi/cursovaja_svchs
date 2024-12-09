@@ -31,9 +31,18 @@ class TokenService {
         }
     }
 
-    async removeToken(refreshToken) {
-        return await Refresh_Token.destroy({ where: { refresh_token: refreshToken } });
-    }
+        async removeToken(refreshToken) {
+            try {
+                const tokenData = await Refresh_Token.destroy({ where: { refresh_token: refreshToken } });
+                console.log("Token removed from database:", tokenData); // Логирование удаления токена из базы данных
+                return tokenData;
+            } catch (e) {
+                console.error("Error removing token from database:", e); // Логирование ошибки удаления токена из базы данных
+                throw e;
+            }
+        }
+    
+    
 
     async findToken(refreshToken) {
         return await Refresh_Token.findOne({ where: { refresh_token: refreshToken } });

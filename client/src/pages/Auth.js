@@ -14,9 +14,6 @@ const Auth = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log('Email:', email);
-    console.log('Password:', password);
   };
 
   const click = async () => {
@@ -27,6 +24,7 @@ const Auth = () => {
         email: decodedToken.email,
         name: decodedToken.name,
         surname: decodedToken.surname,
+        roles: decodedToken.roles,
       });
       user.setIsAuth(true);
       navigate(MAIN_ROUTE);

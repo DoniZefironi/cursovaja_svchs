@@ -14,7 +14,7 @@ class UserService {
         const user = await User.create({ email, password: hashPassword, name, surname, phone_number, roles });
 
         const userDto = new UserDto(user);
-        const tokens = tokenService.generateToken({ ...userDto });
+        const tokens = tokenService.generateToken({ ...userDto, roles });
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
         return { ...tokens, user: userDto };
     }
@@ -29,10 +29,9 @@ class UserService {
             throw ApiError.badRequest("Неверный пароль");
         }
         const userDto = new UserDto(user);
-        const tokens = tokenService.generateToken({ ...userDto });
+        const tokens = tokenService.generateToken({ ...userDto, roles: user.roles });
 
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
-        console.log("Generated tokens:", tokens); // Логирование токенов
         return { ...tokens, user: userDto };
     }
 
@@ -59,7 +58,7 @@ class UserService {
             throw ApiError.unauthorized("User not found");
         }
         const userDto = new UserDto(user);
-        const tokens = tokenService.generateToken({ ...userDto });
+        const tokens = tokenService.generateToken({ ...userDto, roles: user.roles });
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
         return { ...tokens, user: userDto };
     }

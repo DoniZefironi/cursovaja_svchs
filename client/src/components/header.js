@@ -1,16 +1,30 @@
 import React, { useContext } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Container, Navbar, Nav, Dropdown } from 'react-bootstrap';
 import logo from '../images/logo.png';
 import profileicon from '../images/icon.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../pages/Main/main.css';
-import { ADMIN_ROUTE, LOGIN_ROUTE, MAIN_ROUTE, METHOD_ROUTE, SUBJECT_ROUTE, SYLLABUS_ROUTE } from '../utils/consts';
+import { LOGIN_ROUTE, MAIN_ROUTE, METHOD_ROUTE, SUBJECT_ROUTE, SYLLABUS_ROUTE, USERLIST_ROUTE } from '../utils/consts';
 import { Context } from '../index';
+import { logout } from '../http/userAPI';
 
 const Header = observer(() => {
     const { user } = useContext(Context);
+    const navigate = useNavigate();
+
+    console.log("Current user email:", user.user.email);
+    console.log("Current user name:", user.user.name);
+    console.log("Current user surname:", user.user.surname);
+    console.log("Current user roles:", user.user.roles);
+
+    const handleLogout = async () => {
+        await logout();
+        user.setUser({});
+        user.setIsAuth(false);
+        navigate(LOGIN_ROUTE);
+    };
 
     return (
         <Navbar style={{ backgroundColor: '#2B579A' }} variant="dark" expand="lg">
@@ -47,11 +61,11 @@ const Header = observer(() => {
                             <Dropdown.ItemText>Имя: {user.user.name}</Dropdown.ItemText>
                             <Dropdown.ItemText>Фамилия: {user.user.surname}</Dropdown.ItemText>
                             <Dropdown.Divider />
-                            <Dropdown.Item as={Link} to={LOGIN_ROUTE}>Выйти</Dropdown.Item>
+                            <Dropdown.Item onClick={handleLogout}>Выйти</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
-                    {user.isAdmin && (
-                        <Button variant="outline-light" as={Link} to={ADMIN_ROUTE} className="ml-2">Админ</Button>
+                    {user.user.roles && user.user.roles.includes("ADMIN") && (
+                        <Button variant="outline-light" as={Link} to={USERLIST_ROUTE} className="ml-2">Список пользователей</Button>
                     )}
                 </Navbar.Collapse>
             </Container>
