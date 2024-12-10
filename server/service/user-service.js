@@ -19,21 +19,27 @@ class UserService {
         return { ...tokens, user: userDto };
     }
 
-    async login(email, password) {
-        const user = await User.findOne({ where: { email } });
-        if (!user) {
-            throw ApiError.badRequest("User not found");
+        async login(email, password) {
+            const user = await User.findOne({ where: { email } });
+            if (!user) {
+                throw ApiError.badRequest('User not found');
+            }
+    
+            const isPassEquals = await bcrypt.compare(password, user.password);
+            if (!isPassEquals) {
+                throw ApiError.badRequest('Incorrect password');
+            }
+    
+            const userDto = new UserDto(user); // dto возвращает id, email, roles
+            const tokens = tokenService.generateTokens({ ...userDto });
+            await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    
+            return {
+                ...tokens,
+                user: userDto
+            };
         }
-        const isPassEqual = await bcrypt.compare(password, user.password);
-        if (!isPassEqual) {
-            throw ApiError.badRequest("Неверный пароль");
-        }
-        const userDto = new UserDto(user);
-        const tokens = tokenService.generateToken({ ...userDto, roles: user.roles });
-
-        await tokenService.saveToken(userDto.id, tokens.refreshToken);
-        return { ...tokens, user: userDto };
-    }
+    
 
     async logout(refreshToken) {
         const token = await tokenService.removeToken(refreshToken);

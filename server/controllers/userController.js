@@ -161,19 +161,22 @@ class UserController {
         }
     }
 
-        async login(req, res, next) {
-            try {
-                const { email, password } = req.body;
-                console.log("Login request data:", { email, password });
-                const userData = await userService.login(email, password);
-                console.log("User data after login:", userData);
-                res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-                return res.json(userData);
-            } catch (e) {
-                console.error("Login error:", e);
-                next(ApiError.Internal(e.message)); 
-            }
+    async login(req, res, next) {
+        try {
+            const { email, password } = req.body;
+            console.log("Login request data:", { email, password });
+    
+            const userData = await userService.login(email, password);
+            console.log("User data after login:", userData);
+    
+            res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+            return res.json(userData);
+        } catch (e) {
+            console.error("Login error:", e);
+            next(ApiError.Internal(e.message));
         }
+    }
+    
     
 
         async logout(req, res, next) {
