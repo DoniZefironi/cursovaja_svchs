@@ -5,13 +5,13 @@ const bcrypt = require("bcryptjs");
 const UserDto = require("../dtos/user-dtos");
 
 class UserService {
-    async register(email, password, name, surname, phone_number, roles) {
+    async register(email, password, name, surname, patronymic, phone_number, position, roles) {
         const candidate = await User.findOne({ where: { email } });
         if (candidate) {
             throw new Error(`User with email ${email} already exists`);
         }
         const hashPassword = await bcrypt.hash(password, 3);
-        const user = await User.create({ email, password: hashPassword, name, surname, phone_number, roles });
+        const user = await User.create({ email, password: hashPassword, name, surname, patronymic, phone_number, position, roles });
 
         const userDto = new UserDto(user);
         const tokens = tokenService.generateToken({ ...userDto});

@@ -5,12 +5,12 @@ const User = sequelize.define('user', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
     surname: { type: DataTypes.STRING, allowNull: false },
-    patronymic: { type: DataTypes.STRING, allowNull: true }, // Новое поле для отчества
+    patronymic: { type: DataTypes.STRING, allowNull: true }, 
     phone_number: { type: DataTypes.STRING },
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
     roles: { type: DataTypes.STRING, defaultValue: "USER" },
-    position: { type: DataTypes.STRING, allowNull: true }  // Поле для должности
+    position: { type: DataTypes.STRING, allowNull: true }  
 });
 
 const Refresh_Token = sequelize.define('refresh_token', {
@@ -28,7 +28,7 @@ const Syllabus = sequelize.define('syllabus', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     date: { type: DataTypes.DATE, allowNull: false },
     syllfile: { type: DataTypes.STRING, allowNull: false },
-    file: { type: DataTypes.STRING, allowNull: true }  // Новое поле для файла
+    file: { type: DataTypes.STRING, allowNull: true }  
 });
 
 const Form_study = sequelize.define('form_study', {

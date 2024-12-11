@@ -2,39 +2,44 @@ const ApiError = require('../error/ApiError');
 const bcrypt = require('bcrypt');
 const { User } = require('../models/models');
 const { Op } = require('sequelize');
-const {validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const userService = require('../service/user-service');
-const tokenService = require("../service/token-service");
-const UserDto = require("../dtos/user-dtos");
+const tokenService = require('../service/token-service');
+const UserDto = require('../dtos/user-dtos');
 
 class UserController {
-    async searchUsers(req, res) {
+    async searchUsers(req, res, next) {
         try {
+            console.log("Received search request with query:", req.query);
             const { query } = req.query;
             if (!query) {
-                return res.status(400).json({ message: 'Search query is required' });
+                return next(ApiError.badRequest('Search query not provided'));
             }
-    
-            console.log(`Searching users with query: ${query}`);
-            
+
             const users = await User.findAll({
                 where: {
                     [Op.or]: [
                         { name: { [Op.like]: `%${query}%` } },
                         { surname: { [Op.like]: `%${query}%` } },
-                        { email: { [Op.like]: `%${query}%` } }
+                        { email: { [Op.like]: `%${query}%` } },
+                        { patronymic: { [Op.like]: `%${query}%` } }
                     ]
                 }
             });
-    
-            console.log("Users found:", users);
-    
+
+            if (users.length === 0) {
+                return res.status(404).json({ message: 'No users found matching the query' });
+            }
+
+            console.log("Search results:", users);
             return res.json(users);
-        } catch (error) {
-            console.error('Failed to search users:', error);
-            return res.status(500).json({ message: 'Failed to search users' });
+        } catch (err) {
+            console.error('Error during search:', err);
+            return next(ApiError.internal(err.message));
         }
     }
+      
+    
     
     async getAll(req, res) {
         try {
@@ -47,7 +52,8 @@ class UserController {
                 where[Op.or] = [
                     { name: { [Op.like]: `%${search}%` } },
                     { surname: { [Op.like]: `%${search}%` } },
-                    { email: { [Op.like]: `%${search}%` } }
+                    { email: { [Op.like]: `%${search}%` } },
+                    { patronymic: { [Op.like]: `%${search}%` } }
                 ];
             }
     
@@ -75,8 +81,7 @@ class UserController {
             console.error('Failed to retrieve users:', error);
             return res.status(500).json({ error: 'Failed to retrieve users' });
         }
-    }
-    
+    }    
 
     async getById(req, res) {
         try {
@@ -94,19 +99,18 @@ class UserController {
             return res.status(500).json({ error: 'Failed to retrieve user' });
         }
     }
-    
 
     async update(req, res) {
         try {
             const { id } = req.params;
-            const { name, surname, phone_number, email, password, roles } = req.body;
+            const { name, surname, patronymic, email, phone_number, position, roles } = req.body;
 
             const user = await User.findByPk(id);
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
 
-            await user.update({ name, surname, phone_number, email, password, roles });
+            await user.update({ name, surname, patronymic, email, phone_number, position, roles });
             return res.json({ message: 'User updated successfully' });
         } catch (error) {
             return res.status(500).json({ error: 'Failed to update user' });
@@ -148,27 +152,31 @@ class UserController {
     async registration(req, res, next) {
         try {
             const errors = validationResult(req);
-            if(!errors.isEmpty()) {
-                return next(ApiError.badRequest("Ошибка валидации",errors.array()));
+            if (!errors.isEmpty()) {
+                return next(ApiError.badRequest("Ошибка валидации", errors.array()));
             }
-            const { email, password, name, surname, phone_number, roles } = req.body;
-            const userData = await userService.register(email, password, name, surname, phone_number, roles);
+    
+            const { email, password, name, surname, patronymic, phone_number, position, roles } = req.body;
+            console.log("Registration request body:", req.body);
+    
+            const userData = await userService.register(email, password, name, surname, patronymic, phone_number, position, roles);
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             return res.json(userData);
         } catch (e) {
-            console.error(e);
-            next(ApiError.Internal(e.message));  
+            console.error('Registration error:', e);
+            next(ApiError.internal(e.message));
         }
-    }
+    }     
+    
 
     async login(req, res, next) {
         try {
             const { email, password } = req.body;
             console.log("Login request data:", { email, password });
-    
+
             const userData = await userService.login(email, password);
             console.log("User data after login:", userData);
-    
+
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             return res.json(userData);
         } catch (e) {
@@ -176,8 +184,7 @@ class UserController {
             next(ApiError.Internal(e.message));
         }
     }
-    
-    
+
 
         async logout(req, res, next) {
             try {

@@ -20,6 +20,26 @@ export const login = async (email, password) => {
     }
 }
 
+export const registration = async (email, password, name, surname, patronymic, phone_number, position, roles) => {
+    try {
+        const { data } = await $host.post('api/user/registration', {
+            email,
+            password,
+            name,
+            surname,
+            patronymic,
+            phone_number,
+            position,
+            roles
+        });
+        console.log("Registration response data:", data);
+        return data;
+    } catch (error) {
+        console.error("Failed to register:", error.message);
+        console.error("Stack trace:", error.stack);
+        throw error;
+    }
+};
 
 export const logout = async () => {
     try {

@@ -1,23 +1,29 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Container, Row, Col, Collapse, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './userlist.css';
 import { Context } from '../../index';
 import Search from '../../components/searcuser';
 import Report from '../../components/report';
 import ViewByAuthor from '../../components/viewbyauthor'; 
-import { FaPlus, FaMinus } from 'react-icons/fa';
+import UserList from '../../components/userlist';
+import UserModal from '../../components/usermodal';
+import UserModalCreate from '../../components/usermodalcreate';
 
 const UserContainer = observer(() => {
-  const { subject } = useContext(Context);
-  const { users, fetchUsers } = subject;
+  const { subject, user: currentUser } = useContext(Context); 
+  const { users, fetchUsers, createUser, updateUser, currentPage, totalPages } = subject;
   const [openIndex, setOpenIndex] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentUserEdit, setCurrentUserEdit] = useState({ id: null, name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '' });
+  const [newUser, setNewUser] = useState({ name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '', password: '' });
 
   useEffect(() => {
     console.log("Calling fetchUsers...");
-    fetchUsers();
-  }, [fetchUsers]);
+    fetchUsers(currentPage);
+  }, [fetchUsers, currentPage]);
 
   useEffect(() => {
     console.log("Users fetched:", users);
@@ -27,36 +33,83 @@ const UserContainer = observer(() => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const handleCreate = () => {
+    createUser(
+        newUser.email,
+        newUser.password,
+        newUser.name,
+        newUser.surname,
+        newUser.patronymic,
+        newUser.phone_number,
+        newUser.position,
+        newUser.roles
+    );
+    setShowCreateModal(false);
+    setNewUser({ name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '', password: '' });
+};
+
+
+const handleEdit = () => {
+    updateUser(
+        currentUserEdit.id,
+        currentUserEdit.name,
+        currentUserEdit.surname,
+        currentUserEdit.patronymic,  
+        currentUserEdit.email,
+        currentUserEdit.phone_number,
+        currentUserEdit.position,
+        currentUserEdit.roles
+    );
+    setShowEditModal(false);
+    setCurrentUserEdit({ id: null, name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '' });
+    window.location.reload(); 
+};
+
+  const handleChange = (e, key, isNew = false) => {
+    const value = e.target.value;
+    if (isNew) {
+      setNewUser({ ...newUser, [key]: value });
+    } else {
+      setCurrentUserEdit({ ...currentUserEdit, [key]: value });
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      fetchUsers(newPage);
+    }
+  };
+
   return (
     <div className='main'>
       <Container className="mt-4">
+        {currentUser.user.roles.includes("ADMIN") && ( 
+          <Button variant="primary" onClick={() => setShowCreateModal(true)}>Создать</Button>
+        )}
         <Row className='gapchek'>
           <Col md={8}>
-            <div className="content-box list-box width100">
-              {users && users.length > 0 ? (
-                users.map((user, index) => (
-                  <div key={index} className="contentiks">
-                    <div className="list-item">
-                      <div>
-                        <h6>{`${user.surname} ${user.name} ${user.patronymic}`}</h6>
-                        <p>Должность: {user.position}</p>
-                      </div>
-                      <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
-                        {openIndex === index ? <FaMinus /> : <FaPlus />}
-                      </Button>
-                    </div>
-                    <Collapse in={openIndex === index}>
-                      <div className="additional-info">
-                        <p>Email: {user.email}</p>
-                        <p>Phone: {user.phone_number}</p>
-                        <p>Role: {user.roles}</p>
-                      </div>
-                    </Collapse>
-                  </div>
-                ))
-              ) : (
-                <p>No users available</p>
-              )}
+            <UserList
+              users={users}
+              currentUser={currentUser}
+              handleToggle={handleToggle}
+              openIndex={openIndex}
+              setCurrentUserEdit={setCurrentUserEdit}
+              setShowEditModal={setShowEditModal}
+            />
+            <div className="pagination-controls">
+              <Button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span>{`Page ${currentPage} of ${totalPages}`}</span>
+              <Button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
             </div>
           </Col>
           <Col md={4}>
@@ -71,6 +124,24 @@ const UserContainer = observer(() => {
           </Col>
         </Row>
       </Container>
+
+      <UserModalCreate
+        show={showCreateModal}
+        onHide={() => setShowCreateModal(false)}
+        user={newUser}
+        handleChange={(e, key) => handleChange(e, key, true)}
+        handleSave={handleCreate}
+        title="Создать новую запись"
+      />
+
+      <UserModal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        user={currentUserEdit}
+        handleChange={(e, key) => handleChange(e, key)}
+        handleSave={handleEdit}
+        title="Редактировать запись"
+      />
     </div>
   );
 });
