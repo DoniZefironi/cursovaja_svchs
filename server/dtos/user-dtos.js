@@ -10,6 +10,6 @@ module.exports = class UserDto {
         this.id = model.id;
         this.name = model.name;
         this.surname = model.surname;
-        this.roles = model.surname;
+        this.roles = model.roles;
     }
 }

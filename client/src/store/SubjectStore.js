@@ -3,9 +3,9 @@ import { makeAutoObservable } from "mobx";
 
 class SubjectStore {
     subjects = [];
-    users = []; // Добавляем массив для пользователей
+    users = [];
     searchQuery = '';
-    userSearchQuery = ''; // Добавляем переменную для запроса пользователей
+    userSearchQuery = '';
 
     constructor() {
         makeAutoObservable(this);
@@ -56,17 +56,17 @@ class SubjectStore {
     searchSubjects = async () => {
         try {
             console.log("Clearing subjects list...");
-            this.setSubjects([]); 
+            this.setSubjects([]);
             console.log("Searching subjects with query:", this.searchQuery);
             const response = await axios.get(`http://localhost:5000/api/subject/search?query=${encodeURIComponent(this.searchQuery)}`);
             console.log("Fetched search results from API:", response.data);
             this.setSubjects(response.data);
         } catch (error) {
             console.error('Failed to search subjects:', error);
-            this.setSubjects([]); 
+            this.setSubjects([]);
         }
     }
-    
+
     searchUsers = async () => {
         try {
             console.log("Searching users with query:", this.userSearchQuery);
@@ -81,8 +81,24 @@ class SubjectStore {
             this.setUsers([]);
         }
     }
-    
-    
+
+    createSubject = async (name, description) => {
+        try {
+            const response = await axios.post('http://localhost:5000/api/subject/create', { name, description });
+            this.setSubjects([...this.subjects, response.data]);
+        } catch (error) {
+            console.error('Failed to create subject:', error);
+        }
+    }
+
+    updateSubject = async (id, name, description) => {
+        try {
+            const response = await axios.put(`http://localhost:5000/api/subject/${id}`, { name, description });
+            this.setSubjects(this.subjects.map(sub => (sub.id === id ? response.data : sub)));
+        } catch (error) {
+            console.error('Failed to update subject:', error);
+        }
+    }
 }
 
 export default SubjectStore;

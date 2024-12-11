@@ -19,6 +19,7 @@ const App = observer(() => {
                 email: decodedToken.email,
                 name: decodedToken.name,
                 surname: decodedToken.surname,
+                roles: decodedToken.roles,
             });
             user.setIsAuth(true);
         }

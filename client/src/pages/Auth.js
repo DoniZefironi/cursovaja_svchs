@@ -29,7 +29,8 @@ const Auth = () => {
       user.setIsAuth(true);
       navigate(MAIN_ROUTE);
     } catch (error) {
-      console.error('Failed to login:', error);
+      console.error('Failed to login:', error.message);
+      console.error('Stack trace:', error.stack);
     }
   };
 

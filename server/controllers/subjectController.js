@@ -3,6 +3,34 @@ const ApiError = require('../error/ApiError');
 const { Op } = require('sequelize');
 
 class SubjectController {
+ 
+  async create(req, res) {
+    try {
+      const { name, description } = req.body;
+      const subject = await Subject.create({ name, description });
+      return res.json(subject);
+    } catch (error) {
+      console.error('Failed to create subject:', error);
+      return res.status(500).json({ message: 'Failed to create subject' });
+    }
+  }
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const { name, description } = req.body;
+      const subject = await Subject.findByPk(id);
+      if (!subject) {
+        return res.status(404).json({ message: 'Subject not found' });
+      }
+      await subject.update({ name, description });
+      return res.json(subject);
+    } catch (error) {
+      console.error('Failed to update subject:', error);
+      return res.status(500).json({ message: 'Failed to update subject' });
+    }
+  }
+
     async create(req, res) {
         const { name, description, syllabusId } = req.body;
         const subject = await Subject.create({ name, description, syllabusId });

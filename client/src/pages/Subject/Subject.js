@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Container, Row, Col, Collapse, Button } from 'react-bootstrap';
+import { Container, Row, Col, Collapse, Button, Modal, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './subject.css';
 import { Context } from '../../index';
@@ -10,10 +10,14 @@ import ViewByAuthor from '../../components/viewbyauthor';
 import ViewByDate from '../../components/viewbydate';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
-const SubjectContainer = observer(() => {
-  const { subject } = useContext(Context);
-  const { subjects, fetchSubjects } = subject;
+const Subject = observer(() => {
+  const { subject, user } = useContext(Context);
+  const { subjects, fetchSubjects, createSubject, updateSubject } = subject;
   const [openIndex, setOpenIndex] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentSubject, setCurrentSubject] = useState({ id: null, name: '', description: '' });
+  const [newSubject, setNewSubject] = useState({ name: '', description: '' });
 
   useEffect(() => {
     fetchSubjects();
@@ -23,9 +27,33 @@ const SubjectContainer = observer(() => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const handleCreate = () => {
+    createSubject(newSubject.name, newSubject.description);
+    setShowCreateModal(false);
+    setNewSubject({ name: '', description: '' });
+  };
+
+  const handleEdit = () => {
+    updateSubject(currentSubject.id, currentSubject.name, currentSubject.description);
+    setShowEditModal(false);
+    setCurrentSubject({ id: null, name: '', description: '' });
+  };
+
+  const handleChange = (e, key, isNew = false) => {
+    const value = e.target.value;
+    if (isNew) {
+      setNewSubject({ ...newSubject, [key]: value });
+    } else {
+      setCurrentSubject({ ...currentSubject, [key]: value });
+    }
+  };
+
   return (
     <div className='main'>
       <Container className="mt-4">
+        {user.isAdmin && (
+          <Button variant="primary" onClick={() => setShowCreateModal(true)}>Создать</Button>
+        )}
         <Row className='gapchek'>
           <Col md={8}>
             <div className="content-box list-box width100">
@@ -39,6 +67,17 @@ const SubjectContainer = observer(() => {
                       <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
                         {openIndex === index ? <FaMinus /> : <FaPlus />}
                       </Button>
+                      {user.isAdmin && (
+                        <Button
+                          variant="warning"
+                          onClick={() => {
+                            setCurrentSubject(item);
+                            setShowEditModal(true);
+                          }}
+                        >
+                          Изменить
+                        </Button>
+                      )}
                     </div>
                     <Collapse in={openIndex === index}>
                       <div className="additional-info">
@@ -65,8 +104,76 @@ const SubjectContainer = observer(() => {
           </Col>
         </Row>
       </Container>
+
+      {/* Модальное окно для создания новой записи */}
+      <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Создать новую запись</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formCreateSubjectName">
+              <Form.Label>Название</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Введите название"
+                value={newSubject.name}
+                onChange={(e) => handleChange(e, 'name', true)}
+              />
+            </Form.Group>
+            <Form.Group controlId="formCreateSubjectDescription" className="mt-3">
+              <Form.Label>Описание</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Введите описание"
+                value={newSubject.description}
+                onChange={(e) => handleChange(e, 'description', true)}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowCreateModal(false)}>Закрыть</Button>
+          <Button variant="primary" onClick={handleCreate}>Создать</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Модальное окно для редактирования записи */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Редактировать запись</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="formEditSubjectName">
+              <Form.Label>Название</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Введите название"
+                value={currentSubject.name}
+                onChange={(e) => handleChange(e, 'name')}
+              />
+            </Form.Group>
+            <Form.Group controlId="formEditSubjectDescription" className="mt-3">
+              <Form.Label>Описание</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Введите описание"
+                value={currentSubject.description}
+                onChange={(e) => handleChange(e, 'description')}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>Закрыть</Button>
+          <Button variant="primary" onClick={handleEdit}>Сохранить</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 });
 
-export default SubjectContainer;
+export default Subject;

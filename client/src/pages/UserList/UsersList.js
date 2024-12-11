@@ -6,7 +6,7 @@ import './userlist.css';
 import { Context } from '../../index';
 import Search from '../../components/searcuser';
 import Report from '../../components/report';
-import ViewByAuthor from '../../components/viewbyauthor'; // Если это не относится к пользователям, используйте ViewByDate вместо этого.
+import ViewByAuthor from '../../components/viewbyauthor'; 
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
 const UserContainer = observer(() => {
