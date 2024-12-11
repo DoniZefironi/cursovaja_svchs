@@ -10,8 +10,8 @@ import ViewByAuthor from '../../components/viewbyauthor';
 import ViewByDate from '../../components/viewbydate';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
-const Subject = observer(() => {
-  const { subject, user } = useContext(Context);
+const SubjectContainer = observer(() => {
+  const { subject, user } = useContext(Context);  // Получаем информацию о пользователе
   const { subjects, fetchSubjects, createSubject, updateSubject } = subject;
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -37,6 +37,7 @@ const Subject = observer(() => {
     updateSubject(currentSubject.id, currentSubject.name, currentSubject.description);
     setShowEditModal(false);
     setCurrentSubject({ id: null, name: '', description: '' });
+    window.location.reload();  // Перезагрузка страницы после успешного обновления
   };
 
   const handleChange = (e, key, isNew = false) => {
@@ -51,7 +52,7 @@ const Subject = observer(() => {
   return (
     <div className='main'>
       <Container className="mt-4">
-        {user.isAdmin && (
+        {user.user.roles.includes("ADMIN") && ( // Проверяем, что пользователь является администратором
           <Button variant="primary" onClick={() => setShowCreateModal(true)}>Создать</Button>
         )}
         <Row className='gapchek'>
@@ -67,7 +68,7 @@ const Subject = observer(() => {
                       <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
                         {openIndex === index ? <FaMinus /> : <FaPlus />}
                       </Button>
-                      {user.isAdmin && (
+                      {user.user.roles.includes("ADMIN") && ( // Проверяем, что пользователь является администратором
                         <Button
                           variant="warning"
                           onClick={() => {
@@ -176,4 +177,4 @@ const Subject = observer(() => {
   );
 });
 
-export default Subject;
+export default SubjectContainer;
