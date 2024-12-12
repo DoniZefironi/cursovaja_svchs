@@ -2,15 +2,20 @@ const { Methodological_rec } = require('../models/models');
 const ApiError = require('../error/ApiError');
 
 class MethodController {
-    async create(req, res) {
-        try{
-            const { title, description, language, year_create, url, quantity_pages, subjectId, TypeMethodId } = req.body;
-            const met = await Methodological_rec.create({ title, description, language, year_create, url, quantity_pages, subjectId, TypeMethodId });
-            return res.json(met);
-        } catch (err) {
-            return res.status(500).json({ error: 'Failder to create specialities'});
+
+        async create(req, res) {
+            try {
+                const { title, description, language, year_create, url, quantity_pages, subjectId, TypeMethodId } = req.body;
+                console.log("Request body:", req.body); // Log request body
+                const met = await Methodological_rec.create({ title, description, language, year_create, url, quantity_pages, subjectId, TypeMethodId });
+                return res.json(met);
+            } catch (err) {
+                console.error('Failed to create methodological record:', err); // Log error details
+                return res.status(500).json({ error: 'Failed to create methodological record' });
+            }
         }
-    }
+    
+    
 
     async getAll(req, res) {
         try {

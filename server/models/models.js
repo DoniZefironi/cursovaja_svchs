@@ -53,7 +53,7 @@ const Methodological_rec = sequelize.define('methodological_rec', {
     title: { type: DataTypes.STRING, unique: true, allowNull: false },
     description: { type: DataTypes.STRING, allowNull: false },
     language: { type: DataTypes.STRING, allowNull: false },
-    year_create: { type: DataTypes.DATE, allowNull: false },
+    year_create: { type: DataTypes.INTEGER, allowNull: false },
     url: { type: DataTypes.STRING, allowNull: false },
     quantity_pages: { type: DataTypes.INTEGER, allowNull: false }
 });
