@@ -15,7 +15,7 @@ const MethodContainer = observer(() => {
     return <div>Loading...</div>;
   }
 
-  const { methods, fetchMethods, createMethod, updateMethod, deleteMethod, searchMethods, setSearchQuery, currentPage, totalPages, subjects, typeMethods, fetchSubjects, fetchTypeMethods } = method;
+  const { methods, fetchMethods, createMethod, updateMethod, deleteMethod, searchMethods, setSearchQuery, currentPage, totalPages, subjects, typeMethods, fetchSubjects, fetchTypeMethods, downloadMethod } = method;
   
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -90,6 +90,7 @@ const MethodContainer = observer(() => {
                 setShowEditModal(true);
               }}
               handleDelete={handleDelete}
+              handleDownload={downloadMethod}
             />
             <div className="pagination-controls">
               <Button

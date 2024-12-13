@@ -8,7 +8,9 @@ class MethodStore {
     searchQuery = '';
     currentPage = 1;
     totalPages = 1;
+    loading = false;
     pageSize = 10;
+    error = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -36,6 +38,13 @@ class MethodStore {
 
     setTotalPages = (totalPages) => {
         this.totalPages = totalPages;
+    }
+    setLoading = (loading) => {
+        this.loading = loading;
+    }
+    
+    setError = (error) => {
+        this.error = error;
     }
 
     fetchMethods = async (page = 1) => {
@@ -72,16 +81,14 @@ class MethodStore {
 
     searchMethods = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/method/search', {
-                params: { query: this.searchQuery },
-                withCredentials: true
-            });
+            console.log("Clearing methods list...");
+            this.setMethods([]);
+            console.log("Searching methods with query:", this.searchQuery);
+            const response = await axios.get(`http://localhost:5000/api/method/search?query=${encodeURIComponent(this.searchQuery)}`);
+            console.log("Fetched search results from API:", response.data);
             this.setMethods(response.data);
         } catch (error) {
             console.error('Failed to search methods:', error);
-            if (error.response) {
-                console.error('Error response data:', error.response.data);
-            }
             this.setMethods([]);
         }
     }
@@ -115,3 +122,4 @@ class MethodStore {
 }
 
 export default MethodStore;
+

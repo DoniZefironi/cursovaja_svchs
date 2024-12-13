@@ -19,7 +19,7 @@ class UserController {
             const users = await User.findAll({
                 where: {
                     [Op.or]: [
-                        { name: { [Op.like]: `%{query}%` } },
+                        { name: { [Op.like]: `%${query}%` } }, // Corrected placeholder
                         { surname: { [Op.like]: `%${query}%` } },
                         { email: { [Op.like]: `%${query}%` } },
                         { patronymic: { [Op.like]: `%${query}%` } }
@@ -35,17 +35,17 @@ class UserController {
             return res.json(users);
         } catch (err) {
             console.error('Error during search:', err);
-            return next(ApiError.internal(err.message)); // Corrected method name
+            return next(ApiError.internal(err.message));
         }
     }
-      
+    
     async getAll(req, res) {
         try {
             console.log("Received request to get all users");
             const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
             const offset = (page - 1) * limit;
             const where = {};
-    
+
             if (search) {
                 where[Op.or] = [
                     { name: { [Op.like]: `%${search}%` } },
@@ -54,22 +54,22 @@ class UserController {
                     { patronymic: { [Op.like]: `%${search}%` } }
                 ];
             }
-    
+
             for (const key in filter) {
                 if (filter.hasOwnProperty(key)) {
                     where[key] = filter[key];
                 }
             }
-    
+
             const users = await User.findAndCountAll({
                 where,
                 limit,
                 offset,
                 order: [[sortBy, order]]
             });
-    
+
             console.log("Users retrieved from database:", users.rows);
-    
+
             return res.json({
                 total: users.count,
                 pages: Math.ceil(users.count / limit),

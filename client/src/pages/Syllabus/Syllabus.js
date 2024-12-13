@@ -84,7 +84,7 @@ const SyllabusContainer = observer(() => {
         )}
         <Row className='gapchek'>
           <Col md={8}>
-            <SyllabusList
+          <SyllabusList
               syllabuses={syllabuses}
               currentUser={currentUser}
               handleToggle={handleToggle}

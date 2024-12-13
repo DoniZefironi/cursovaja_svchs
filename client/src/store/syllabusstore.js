@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
+import userMain from './usermain';
 
 class SyllabusStore {
     syllabuses = [];
@@ -10,7 +11,8 @@ class SyllabusStore {
     loading = false;
     error = null;
 
-    constructor() {
+    constructor(userMain) {
+        this.userMain = userMain; // Сохраняем экземпляр UserMain
         makeAutoObservable(this);
     }
 
@@ -133,18 +135,26 @@ class SyllabusStore {
         }
     }
 
+    // Новый метод для скачивания файла
     downloadSyllabus = async (filename) => {
+        this.setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/static/${filename}`, { responseType: 'blob' });
+            const response = await axios.get(`http://localhost:5000/api/syllabus/download/${filename}`, {
+                responseType: 'blob' // Указываем, что ожидаем бинарные данные
+            });
+
+            // Создаем URL для скачивания файла
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', filename);
+            link.setAttribute('download', filename); // Указываем имя файла
             document.body.appendChild(link);
             link.click();
-            link.remove(); 
+            link.remove();
         } catch (error) {
             this.setError(error.response?.data || 'Failed to download syllabus');
+        } finally {
+            this.setLoading(false);
         }
     }
 }

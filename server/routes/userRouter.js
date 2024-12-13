@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/auth-middleware');
 
 
 router.get('/all',userController.getAll);
-router.get('/:id',userController.getById);
+// router.get('/:id',userController.getById);
 router.put('/:id', userController.update);
 router.delete('/:id', userController.delete);
 router.get('/exists', userController.checkExistence);

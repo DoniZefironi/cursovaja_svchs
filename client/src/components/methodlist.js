@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Collapse } from 'react-bootstrap';
-import { FaPlus, FaMinus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaFileDownload, FaPlus, FaMinus, FaEdit, FaTrash } from 'react-icons/fa';
 
-const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete, currentUser }) => {
+const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete, currentUser, handleDownload }) => {
   return (
     <div className="content-box list-box">
       {methods.map((method, index) => (
@@ -12,6 +12,11 @@ const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete
               <h6>{method.title}</h6>
               <p>{method.author} ({method.university}, {method.year_create})</p>
             </div>
+                          <div>
+                            <Button variant="link" onClick={() => handleDownload(method.syllfile)}>
+                              <FaFileDownload />
+                            </Button>
+                          </div>
             <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
               {openIndex === index ? <FaMinus /> : <FaPlus />}
             </Button>

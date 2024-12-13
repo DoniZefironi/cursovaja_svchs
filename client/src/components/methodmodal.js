@@ -54,13 +54,11 @@ const MethodModal = ({ show, onHide, method, handleChange, handleSave, title, su
               onChange={(e) => handleChange(e, 'date_realese')}
             />
           </Form.Group>
-          <Form.Group controlId="formMethodUrl" className="mt-3">
-            <Form.Label>URL</Form.Label>
+          <Form.Group controlId="formMethodFile" className="mt-3">
+            <Form.Label>File</Form.Label>
             <Form.Control
-              type="text"
-              placeholder="Введите URL"
-              value={method.url}
-              onChange={(e) => handleChange(e, 'url')}
+              type="file"
+              onChange={(e) => handleChange(e, 'url', true)}
             />
           </Form.Group>
           <Form.Group controlId="formMethodQuantityPages" className="mt-3">

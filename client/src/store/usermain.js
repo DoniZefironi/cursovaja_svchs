@@ -36,7 +36,14 @@ export default class UserMain {
         localStorage.setItem('user', JSON.stringify(user));
         console.log(this._user);
     }
-
+    setToken(token) {
+        this._token = token; 
+        localStorage.setItem('token', token);
+    }
+    
+    get token() {
+        return this._token || localStorage.getItem('token'); 
+    }
     get isAuth() {
         return this._isAuth;
     }
