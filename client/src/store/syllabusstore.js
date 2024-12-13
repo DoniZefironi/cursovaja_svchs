@@ -117,7 +117,7 @@ class SyllabusStore {
     searchSyllabuses = async () => {
         if (!this.searchQuery) {
             this.setError('Search query not provided');
-            this.setLoading(false); // Обязательно верните loading в false
+            this.setLoading(false); 
             return;
         }
         this.setLoading(true);
@@ -142,7 +142,7 @@ class SyllabusStore {
             link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
-            link.remove(); // Удалите ссылку после скачивания
+            link.remove(); 
         } catch (error) {
             this.setError(error.response?.data || 'Failed to download syllabus');
         }

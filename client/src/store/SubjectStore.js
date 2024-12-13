@@ -2,9 +2,8 @@ import axios from 'axios';
 import { makeAutoObservable } from "mobx";
 
 class SubjectStore {
-    users = [];
+    subjects = [];
     searchQuery = '';
-    userSearchQuery = '';
     currentPage = 1;
     totalPages = 1;
     pageSize = 10;
@@ -12,18 +11,15 @@ class SubjectStore {
     constructor() {
         makeAutoObservable(this);
     }
+
     setSubjects = (subjects) => {
         this.subjects = subjects;
         console.log("Subjects set in MobX store:", this.subjects);
     }
-    setUsers = (users) => {
-        this.users = users;
-        console.log("Users set in MobX store:", this.users);
-    }
 
-    setUserSearchQuery = (query) => {
-        this.userSearchQuery = query;
-        console.log("User search query set in MobX store:", this.userSearchQuery);
+    setSearchQuery = (query) => {
+        this.searchQuery = query;
+        console.log("Search query set in MobX store:", this.searchQuery);
     }
 
     setPage = (page) => {
@@ -34,22 +30,6 @@ class SubjectStore {
     setTotalPages = (totalPages) => {
         this.totalPages = totalPages;
         console.log("Total pages set in MobX store:", this.totalPages);
-    }
-
-    fetchUsers = async (page = 1) => {
-        try {
-            console.log(`Fetching users from API for page ${page}...`);
-            const response = await axios.get('http://localhost:5000/api/user/all', {
-                params: { page, limit: this.pageSize },
-                withCredentials: true
-            });
-            console.log("Fetched users from API:", response.data.data);
-            this.setUsers(response.data.data);
-            this.setTotalPages(response.data.pages);
-            this.setPage(page);
-        } catch (error) {
-            console.error('Failed to fetch users:', error);
-        }
     }
 
     fetchSubjects = async () => {
@@ -77,24 +57,6 @@ class SubjectStore {
         }
     }
 
-    searchUsers = async () => {
-        try {
-            console.log("Searching users with query:", this.userSearchQuery);
-            const response = await axios.get('http://localhost:5000/api/user/search', {
-                params: { query: this.userSearchQuery },
-                withCredentials: true
-            });
-            console.log("Fetched user search results from API:", response.data);
-            this.setUsers(response.data);
-        } catch (error) {
-            console.error('Failed to search users:', error);
-            if (error.response) {
-                console.error('Error response data:', error.response.data);
-            }
-            this.setUsers([]);
-        }
-    } 
-
     createSubject = async (name, description) => {
         try {
             const response = await axios.post('http://localhost:5000/api/subject/create', { name, description });
@@ -112,33 +74,6 @@ class SubjectStore {
             console.error('Failed to update subject:', error);
         }
     }
-
-    createUser = async (email, password, name, surname, patronymic, phone_number, position, roles) => {
-        try {
-            const response = await axios.post('http://localhost:5000/api/user/registration', {
-                email, password, name, surname, patronymic, phone_number, position, roles
-            });
-            this.setUsers([...this.users, response.data]);
-        } catch (error) {
-            console.error('Failed to create user:', error);
-            if (error.response) {
-                console.error('Error response data:', error.response.data);
-            }
-        }
-    }    
-    
-    
-    updateUser = async (id, name, surname, patronymic, email, phone_number, position, roles) => {
-        try {
-            const response = await axios.put(`http://localhost:5000/api/user/${id}`, {
-                name, surname, patronymic, email, phone_number, position, roles
-            });
-            this.setUsers(this.users.map(user => (user.id === id ? response.data : user)));
-        } catch (error) {
-            console.error('Failed to update user:', error);
-        }
-    }
-    
 }
 
 export default SubjectStore;

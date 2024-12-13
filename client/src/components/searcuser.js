@@ -4,8 +4,8 @@ import { FaSearch } from 'react-icons/fa';
 import { Context } from '../index';
 
 const SearchUser = () => {
-  const { subject } = useContext(Context);
-  const { setUserSearchQuery, searchUsers } = subject;
+  const { author } = useContext(Context);
+  const { setUserSearchQuery, searchUsers } = author;
   const [search, setSearch] = useState('');
 
   const handleSearch = (e) => {

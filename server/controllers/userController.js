@@ -19,7 +19,7 @@ class UserController {
             const users = await User.findAll({
                 where: {
                     [Op.or]: [
-                        { name: { [Op.like]: `%${query}%` } },
+                        { name: { [Op.like]: `%{query}%` } },
                         { surname: { [Op.like]: `%${query}%` } },
                         { email: { [Op.like]: `%${query}%` } },
                         { patronymic: { [Op.like]: `%${query}%` } }
@@ -35,12 +35,10 @@ class UserController {
             return res.json(users);
         } catch (err) {
             console.error('Error during search:', err);
-            return next(ApiError.internal(err.message));
+            return next(ApiError.internal(err.message)); // Corrected method name
         }
     }
       
-    
-    
     async getAll(req, res) {
         try {
             console.log("Received request to get all users");
@@ -81,7 +79,7 @@ class UserController {
             console.error('Failed to retrieve users:', error);
             return res.status(500).json({ error: 'Failed to retrieve users' });
         }
-    }    
+    }
 
     async getById(req, res) {
         try {
@@ -155,19 +153,18 @@ class UserController {
             if (!errors.isEmpty()) {
                 return next(ApiError.badRequest("Ошибка валидации", errors.array()));
             }
-    
+
             const { email, password, name, surname, patronymic, phone_number, position, roles } = req.body;
             console.log("Registration request body:", req.body);
-    
+
             const userData = await userService.register(email, password, name, surname, patronymic, phone_number, position, roles);
             res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             return res.json(userData);
         } catch (e) {
             console.error('Registration error:', e);
-            next(ApiError.internal(e.message));
+            next(ApiError.internal(e.message)); // Corrected method name
         }
     }     
-    
 
     async login(req, res, next) {
         try {
@@ -181,28 +178,25 @@ class UserController {
             return res.json(userData);
         } catch (e) {
             console.error("Login error:", e);
-            next(ApiError.Internal(e.message));
+            next(ApiError.internal(e.message)); // Corrected method name
         }
     }
 
-
-        async logout(req, res, next) {
-            try {
-                const { refreshToken } = req.cookies;
-                console.log("Received refresh token for logout:", refreshToken); // Логирование токена
-                if (!refreshToken) {
-                    throw ApiError.badRequest("Refresh token not provided");
-                }
-                const token = await userService.logout(refreshToken);
-                res.clearCookie('refreshToken');
-                return res.json(token);
-            } catch (e) {
-                console.error("Logout error:", e); // Логирование ошибки
-                next(ApiError.Internal(e.message));
+    async logout(req, res, next) {
+        try {
+            const { refreshToken } = req.cookies;
+            console.log("Received refresh token for logout:", refreshToken); // Логирование токена
+            if (!refreshToken) {
+                throw ApiError.badRequest("Refresh token not provided");
             }
+            const token = await userService.logout(refreshToken);
+            res.clearCookie('refreshToken');
+            return res.json(token);
+        } catch (e) {
+            console.error("Logout error:", e); // Логирование ошибки
+            next(ApiError.internal(e.message)); // Corrected method name
         }
-        
-    
+    }
 
     async refresh(req, res, next) {
         try {
@@ -217,10 +211,9 @@ class UserController {
             return res.json(userData);
         } catch (e) {
             console.error("Refresh error:", e); 
+            next(ApiError.internal(e.message)); // Corrected method name
         }
     }
-    
-    
 }
 
 module.exports = new UserController();

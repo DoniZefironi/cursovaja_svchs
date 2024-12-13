@@ -11,7 +11,7 @@ import ViewByDate from '../../components/viewbydate';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
 const SubjectContainer = observer(() => {
-  const { subject, user } = useContext(Context);  // Получаем информацию о пользователе
+  const { subject, user } = useContext(Context);  
   const { subjects, fetchSubjects, createSubject, updateSubject } = subject;
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);

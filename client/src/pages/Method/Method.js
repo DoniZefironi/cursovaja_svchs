@@ -9,7 +9,7 @@ import MethodList from '../../components/methodlist';
 import MethodModal from '../../components/methodmodal';
 
 const MethodContainer = observer(() => {
-  const { method } = useContext(Context);
+  const { method, user: currentUser } = useContext(Context);
 
   if (!method) {
     return <div>Loading...</div>;
@@ -75,12 +75,15 @@ const MethodContainer = observer(() => {
   return (
     <div className='main'>
       <Container className="mt-4">
+      {currentUser.user.roles.includes("ADMIN") && (
         <Button variant="primary" onClick={() => setShowCreateModal(true)}>Создать</Button>
+      )}
         <Row className='gapchek'>
           <Col md={8}>
             <MethodList
               methods={methods}
               handleToggle={handleToggle}
+              currentUser={currentUser}
               openIndex={openIndex}
               handleEdit={(method) => {
                 setCurrentMethod(method);

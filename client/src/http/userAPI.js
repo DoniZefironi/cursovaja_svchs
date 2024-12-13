@@ -43,7 +43,7 @@ export const registration = async (email, password, name, surname, patronymic, p
 
 export const logout = async () => {
     try {
-        await $authHost.post('api/user/logout', {}, { withCredentials: true }); // Добавляем withCredentials: true
+        await $authHost.post('api/user/logout', {}, { withCredentials: true }); 
         localStorage.removeItem('token');
     } catch (error) {
         console.error("Failed to logout:", error);

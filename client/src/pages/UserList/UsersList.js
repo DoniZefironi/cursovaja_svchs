@@ -12,8 +12,8 @@ import UserModal from '../../components/usermodal';
 import UserModalCreate from '../../components/usermodalcreate';
 
 const UserContainer = observer(() => {
-  const { subject, user: currentUser } = useContext(Context); 
-  const { users, fetchUsers, createUser, updateUser, currentPage, totalPages } = subject;
+  const { author, user: currentUser } = useContext(Context); 
+  const { users, fetchUsers, createUser, updateUser, currentPage, totalPages } = author;
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);

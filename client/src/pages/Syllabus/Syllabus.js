@@ -84,7 +84,6 @@ const SyllabusContainer = observer(() => {
         )}
         <Row className='gapchek'>
           <Col md={8}>
-            <SearchSyllabus /> {/* Using the SearchSyllabus component */}
             <SyllabusList
               syllabuses={syllabuses}
               currentUser={currentUser}
@@ -114,6 +113,7 @@ const SyllabusContainer = observer(() => {
           </Col>
           <Col md={4}>
             <div className="content-box filter-box">
+              <SearchSyllabus />
               <div className="filter-section">
                 <h5>Просмотр</h5>
                 <ViewByAuthor />

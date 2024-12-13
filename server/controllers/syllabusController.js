@@ -18,19 +18,13 @@ class SyllabusController {
             const fileName = uuid.v4() + path.extname(syllfile.name);
             const filePath = path.resolve(__dirname, '..', 'static', fileName);
 
-            syllfile.mv(filePath, (err) => {
-                if (err) {
-                    return next(ApiError.internal('File upload failed'));
-                }
-            });
-
+            await syllfile.mv(filePath); // Используем await для обработки ошибок
             const syllabus = await Syllabus.create({ date, name, syllfile: fileName });
+
             return res.json(syllabus);
         } catch (err) {
             console.error('Error creating syllabus:', err);
-            if (!res.headersSent) {
-                return next(ApiError.internal('Failed to create syllabus'));
-            }
+            return next(ApiError.internal('Failed to create syllabus'));
         }
     }
 
@@ -47,12 +41,6 @@ class SyllabusController {
                 ];
             }
 
-            for (const key in filter) {
-                if (filter.hasOwnProperty(key)) {
-                    where[key] = filter[key];
-                }
-            }
-
             const syllabuses = await Syllabus.findAndCountAll({
                 where,
                 limit,
@@ -67,9 +55,7 @@ class SyllabusController {
             });
         } catch (error) {
             console.error('Error retrieving syllabuses:', error);
-            if (!res.headersSent) {
-                return next(ApiError.internal('Failed to retrieve syllabuses'));
-            }
+            return next(ApiError.internal('Failed to retrieve syllabuses'));
         }
     }
 
@@ -88,35 +74,26 @@ class SyllabusController {
             if (syllfile) {
                 fileName = uuid.v4() + path.extname(syllfile.name);
                 const filePath = path.resolve(__dirname, '..', 'static', fileName);
-
-                syllfile.mv(filePath, (err) => {
-                    if (err) {
-                        return next(ApiError.internal('File upload failed'));
-                    }
-                });
+                await syllfile.mv(filePath); // Используем await для обработки ошибок
             }
 
             await syllabus.update({ date, name, syllfile: fileName });
             return res.json({ message: 'Syllabus updated successfully' });
         } catch (err) {
             console.error('Error updating syllabus:', err);
-            if (!res.headersSent) {
-                return next(ApiError.internal('Failed to update syllabus'));
-            }
+            return next(ApiError.internal('Failed to update syllabus'));
         }
     }
 
     async search(req, res, next) {
         try {
             const { query } = req.query;
-            console.log("Search query:", query);
 
             if (!query) {
                 return next(ApiError.badRequest('Search query not provided'));
             }
 
             const isValidDate = !isNaN(Date.parse(query));
-
             const conditions = {
                 [Op.or]: [
                     { name: { [Op.like]: `%${query}%` } },
@@ -126,19 +103,15 @@ class SyllabusController {
 
             if (isValidDate) {
                 const date = new Date(query);
-                conditions[Op.or].push(
-                    {
-                        date: {
-                            [Op.gte]: new Date(date.setHours(0, 0, 0, 0)),
-                            [Op.lte]: new Date(date.setHours(23, 59, 59, 999))
-                        }
+                conditions[Op.or].push({
+                    date: {
+                        [Op.gte]: new Date(date.setHours(0, 0, 0, 0)),
+                        [Op.lte]: new Date(date.setHours(23, 59, 59, 999))
                     }
-                );
+                });
             }
 
             const syllabuses = await Syllabus.findAll({ where: conditions });
-
-            console.log("Search results:", syllabuses);
 
             if (syllabuses.length === 0) {
                 return next(ApiError.notFound('No syllabus found matching the query'));
@@ -147,9 +120,7 @@ class SyllabusController {
             return res.json(syllabuses);
         } catch (err) {
             console.error('Error searching syllabuses:', err);
-            if (!res.headersSent) {
-                return next(ApiError.internal('Failed to search syllabuses'));
-            }
+            return next(ApiError.internal('Failed to search syllabuses'));
         }
     }
 
@@ -162,13 +133,18 @@ class SyllabusController {
                 return next(ApiError.notFound('Syllabus not found'));
             }
 
+            const filePath = path.resolve(__dirname, '..', 'static', syllabus.syllfile);
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error('Error deleting file:', err);
+                }
+            });
+
             await syllabus.destroy();
             return res.json({ message: 'Syllabus deleted successfully' });
         } catch (error) {
             console.error('Error deleting syllabus:', error);
-            if (!res.headersSent) {
-                return next(ApiError.internal('Failed to delete syllabus'));
-            }
+            return next(ApiError.internal('Failed to delete syllabus'));
         }
     }
 
