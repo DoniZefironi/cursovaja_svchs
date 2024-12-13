@@ -1,16 +1,12 @@
-class ApiError extends Error{
-    constructor(status, message){
-        super();
-        this.status = status
-        this.message = message
+class ApiError extends Error {
+    constructor(status, message, errors = []) {
+        super(message);
+        this.status = status;
+        this.errors = errors;
     }
 
-    static ok(message){
-        return new ApiError(200, message);
-    }
-
-    static badRequest(message,errors = []) {
-        return new ApiError(400, message);
+    static badRequest(message, errors = []) {
+        return new ApiError(400, message, errors);
     }
 
     static unauthorized(message) {
@@ -25,12 +21,9 @@ class ApiError extends Error{
         return new ApiError(404, message);
     }
 
-
-    static Internal(message) { // Внутренняя ошибка сервера
+    static internal(message) {
         return new ApiError(500, message);
     }
-
 }
 
-
-module.exports = ApiError
+module.exports = ApiError;

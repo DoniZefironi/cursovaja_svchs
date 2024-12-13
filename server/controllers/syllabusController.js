@@ -1,5 +1,6 @@
 const uuid = require('uuid');
 const path = require('path');
+const fs = require('fs');
 const { Syllabus } = require('../models/models');
 const ApiError = require('../error/ApiError');
 const { Op } = require('sequelize');
@@ -7,15 +8,15 @@ const { Op } = require('sequelize');
 class SyllabusController {
     async create(req, res, next) {
         try {
-            const { date } = req.body;
+            const { date, name } = req.body;
             const { syllfile } = req.files;
 
             if (!syllfile) {
                 return next(ApiError.badRequest('No file uploaded'));
             }
 
-            let fileName = uuid.v4() + path.extname(syllfile.name);
-            let filePath = path.resolve(__dirname, '..', 'static', fileName);
+            const fileName = uuid.v4() + path.extname(syllfile.name);
+            const filePath = path.resolve(__dirname, '..', 'static', fileName);
 
             syllfile.mv(filePath, (err) => {
                 if (err) {
@@ -23,14 +24,17 @@ class SyllabusController {
                 }
             });
 
-            const syllabus = await Syllabus.create({ date, syllfile: fileName });
+            const syllabus = await Syllabus.create({ date, name, syllfile: fileName });
             return res.json(syllabus);
         } catch (err) {
-            return res.status(500).json({ error: 'Failed to create syllabus' });
+            console.error('Error creating syllabus:', err);
+            if (!res.headersSent) {
+                return next(ApiError.internal('Failed to create syllabus'));
+            }
         }
     }
 
-    async getAll(req, res) {
+    async getAll(req, res, next) {
         try {
             const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
             const offset = (page - 1) * limit;
@@ -38,7 +42,8 @@ class SyllabusController {
 
             if (search) {
                 where[Op.or] = [
-                    { date: { [Op.like]: `%${search}%` } }
+                    { date: { [Op.like]: `%${search}%` } },
+                    { name: { [Op.like]: `%${search}%` } }
                 ];
             }
 
@@ -61,29 +66,18 @@ class SyllabusController {
                 data: syllabuses.rows
             });
         } catch (error) {
-            return res.status(500).json({ error: 'Failed to retrieve syllabuses' });
+            console.error('Error retrieving syllabuses:', error);
+            if (!res.headersSent) {
+                return next(ApiError.internal('Failed to retrieve syllabuses'));
+            }
         }
-    }
-
-    async getOne(req, res, next) {
-        const { id } = req.query;
-        if (!id) {
-            return next(ApiError.badRequest('ID not provided'));
-        }
-
-        const syllabus = await Syllabus.findByPk(id);
-        if (!syllabus) {
-            return next(ApiError.notFound('Syllabus not found'));
-        }
-
-        return res.json(syllabus);
     }
 
     async updateOne(req, res, next) {
         try {
             const { id } = req.params;
-            const { date } = req.body;
-            const { syllfile } = req.files;
+            const { date, name } = req.body;
+            const syllfile = req.files ? req.files.syllfile : null;
 
             const syllabus = await Syllabus.findByPk(id);
             if (!syllabus) {
@@ -93,7 +87,7 @@ class SyllabusController {
             let fileName = syllabus.syllfile;
             if (syllfile) {
                 fileName = uuid.v4() + path.extname(syllfile.name);
-                let filePath = path.resolve(__dirname, '..', 'static', fileName);
+                const filePath = path.resolve(__dirname, '..', 'static', fileName);
 
                 syllfile.mv(filePath, (err) => {
                     if (err) {
@@ -102,36 +96,60 @@ class SyllabusController {
                 });
             }
 
-            await syllabus.update({ date, syllfile: fileName });
+            await syllabus.update({ date, name, syllfile: fileName });
             return res.json({ message: 'Syllabus updated successfully' });
         } catch (err) {
-            return next(ApiError.internal(err.message));
+            console.error('Error updating syllabus:', err);
+            if (!res.headersSent) {
+                return next(ApiError.internal('Failed to update syllabus'));
+            }
         }
     }
 
     async search(req, res, next) {
         try {
             const { query } = req.query;
+            console.log("Search query:", query);
+
             if (!query) {
                 return next(ApiError.badRequest('Search query not provided'));
             }
 
-            const syllabus = await Syllabus.findAll({
-                where: {
-                    [Op.or]: [
-                        { date: { [Op.like]: `%${query}%` } },
-                        { syllfile: { [Op.like]: `%${query}%` } }
-                    ]
-                }
-            });
+            const isValidDate = !isNaN(Date.parse(query));
 
-            if (syllabus.length === 0) {
+            const conditions = {
+                [Op.or]: [
+                    { name: { [Op.like]: `%${query}%` } },
+                    { syllfile: { [Op.like]: `%${query}%` } }
+                ]
+            };
+
+            if (isValidDate) {
+                const date = new Date(query);
+                conditions[Op.or].push(
+                    {
+                        date: {
+                            [Op.gte]: new Date(date.setHours(0, 0, 0, 0)),
+                            [Op.lte]: new Date(date.setHours(23, 59, 59, 999))
+                        }
+                    }
+                );
+            }
+
+            const syllabuses = await Syllabus.findAll({ where: conditions });
+
+            console.log("Search results:", syllabuses);
+
+            if (syllabuses.length === 0) {
                 return next(ApiError.notFound('No syllabus found matching the query'));
             }
 
-            return res.json(syllabus);
+            return res.json(syllabuses);
         } catch (err) {
-            return next(ApiError.internal(err.message));
+            console.error('Error searching syllabuses:', err);
+            if (!res.headersSent) {
+                return next(ApiError.internal('Failed to search syllabuses'));
+            }
         }
     }
 
@@ -141,14 +159,34 @@ class SyllabusController {
         try {
             const syllabus = await Syllabus.findByPk(id);
             if (!syllabus) {
-                return res.status(404).json({ error: 'Syllabus not found' });
+                return next(ApiError.notFound('Syllabus not found'));
             }
 
             await syllabus.destroy();
             return res.json({ message: 'Syllabus deleted successfully' });
         } catch (error) {
-            return res.status(500).json({ error: 'Failed to delete syllabus' });
+            console.error('Error deleting syllabus:', error);
+            if (!res.headersSent) {
+                return next(ApiError.internal('Failed to delete syllabus'));
+            }
         }
+    }
+
+    async downloadFile(req, res, next) {
+        const { filename } = req.params;
+        const filePath = path.resolve(__dirname, '..', 'static', filename);
+    
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                return next(ApiError.notFound('File not found'));
+            }
+    
+            res.download(filePath, filename, (err) => {
+                if (err) {
+                    return next(ApiError.internal('File download failed'));
+                }
+            });
+        });
     }
 }
 

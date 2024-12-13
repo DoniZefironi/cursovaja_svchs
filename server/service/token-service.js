@@ -34,10 +34,10 @@ class TokenService {
         async removeToken(refreshToken) {
             try {
                 const tokenData = await Refresh_Token.destroy({ where: { refresh_token: refreshToken } });
-                console.log("Token removed from database:", tokenData); // Логирование удаления токена из базы данных
+                console.log("Token removed from database:", tokenData); 
                 return tokenData;
             } catch (e) {
-                console.error("Error removing token from database:", e); // Логирование ошибки удаления токена из базы данных
+                console.error("Error removing token from database:", e);
                 throw e;
             }
         }
