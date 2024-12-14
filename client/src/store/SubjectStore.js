@@ -32,12 +32,16 @@ class SubjectStore {
         console.log("Total pages set in MobX store:", this.totalPages);
     }
 
-    fetchSubjects = async () => {
+    fetchSubjects = async (page = 1) => {
         try {
             console.log("Fetching subjects from API...");
-            const response = await axios.get('http://localhost:5000/api/subject/all');
+            const response = await axios.get('http://localhost:5000/api/subject/all', {
+                params: { page, limit: this.pageSize }
+            });
             console.log("Fetched subjects from API:", response.data.data);
             this.setSubjects(response.data.data);
+            this.setTotalPages(response.data.pages);
+            this.setPage(page);
         } catch (error) {
             console.error('Failed to fetch subjects:', error);
         }
@@ -48,7 +52,9 @@ class SubjectStore {
             console.log("Clearing subjects list...");
             this.setSubjects([]);
             console.log("Searching subjects with query:", this.searchQuery);
-            const response = await axios.get(`http://localhost:5000/api/subject/search?query=${encodeURIComponent(this.searchQuery)}`);
+            const response = await axios.get(`http://localhost:5000/api/subject/search`, {
+                params: { query: this.searchQuery }
+            });
             console.log("Fetched search results from API:", response.data);
             this.setSubjects(response.data);
         } catch (error) {

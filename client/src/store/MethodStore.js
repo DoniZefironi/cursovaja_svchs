@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable } from 'mobx';
 
 class MethodStore {
     methods = [];
@@ -9,10 +9,10 @@ class MethodStore {
     currentPage = 1;
     totalPages = 1;
     loading = false;
-    pageSize = 10;
     error = null;
 
-    constructor() {
+    constructor(userMain) {
+        this.userMain = userMain; 
         makeAutoObservable(this);
     }
 
@@ -39,87 +39,140 @@ class MethodStore {
     setTotalPages = (totalPages) => {
         this.totalPages = totalPages;
     }
+
     setLoading = (loading) => {
         this.loading = loading;
     }
-    
+
     setError = (error) => {
         this.error = error;
     }
 
     fetchMethods = async (page = 1) => {
+        this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/method/all', {
-                params: { page, limit: this.pageSize },
-                withCredentials: true
+                params: { page, limit: 10 }
             });
             this.setMethods(response.data.data);
             this.setTotalPages(response.data.pages);
             this.setPage(page);
         } catch (error) {
-            console.error('Failed to fetch methods:', error);
+            this.setError(error.response?.data || 'Failed to fetch methods');
+        } finally {
+            this.setLoading(false);
         }
     }
 
     fetchSubjects = async () => {
+        this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/subject/all', { withCredentials: true });
             this.setSubjects(response.data.data);
         } catch (error) {
-            console.error('Failed to fetch subjects:', error);
+            this.setError(error.response?.data || 'Failed to fetch subjects');
+        } finally {
+            this.setLoading(false);
         }
     }
 
     fetchTypeMethods = async () => {
+        this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/type_method/all', { withCredentials: true });
             this.setTypeMethods(response.data.data);
         } catch (error) {
-            console.error('Failed to fetch type methods:', error);
+            this.setError(error.response?.data || 'Failed to fetch type methods');
+        } finally {
+            this.setLoading(false);
         }
     }
 
     searchMethods = async () => {
+        if (!this.searchQuery) {
+            this.setError('Search query not provided');
+            this.setLoading(false);
+            return;
+        }
+        this.setLoading(true);
         try {
-            console.log("Clearing methods list...");
-            this.setMethods([]);
-            console.log("Searching methods with query:", this.searchQuery);
-            const response = await axios.get(`http://localhost:5000/api/method/search?query=${encodeURIComponent(this.searchQuery)}`);
-            console.log("Fetched search results from API:", response.data);
+            const response = await axios.get('http://localhost:5000/api/method/search', {
+                params: { query: this.searchQuery }
+            });
             this.setMethods(response.data);
         } catch (error) {
-            console.error('Failed to search methods:', error);
-            this.setMethods([]);
+            this.setError(error.response?.data || 'Failed to search methods');
+        } finally {
+            this.setLoading(false);
         }
     }
 
-    createMethod = async (method) => {
+    createMethod = async (formData) => {
+        this.setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/method/create', method);
+            const response = await axios.post('http://localhost:5000/api/method/create', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             this.setMethods([...this.methods, response.data]);
         } catch (error) {
-            console.error('Failed to create method:', error);
+            this.setError(error.response?.data || 'Failed to create method');
+        } finally {
+            this.setLoading(false);
         }
     }
 
-    updateMethod = async (id, method) => {
+    updateMethod = async (id, formData) => {
+        this.setLoading(true);
         try {
-            const response = await axios.put(`http://localhost:5000/api/method/${id}`, method);
-            this.setMethods(this.methods.map(met => (met.id === id ? response.data : met)));
+            const response = await axios.put(`http://localhost:5000/api/method/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            this.setMethods(this.methods.map(method => (method.id === id ? response.data : method)));
         } catch (error) {
-            console.error('Failed to update method:', error);
+            this.setError(error.response?.data || 'Failed to update method');
+        } finally {
+            this.setLoading(false);
         }
     }
 
     deleteMethod = async (id) => {
+        this.setLoading(true);
         try {
             await axios.delete(`http://localhost:5000/api/method/${id}`);
-            this.setMethods(this.methods.filter(met => met.id !== id));
+            this.setMethods(this.methods.filter(method => method.id !== id));
         } catch (error) {
-            console.error('Failed to delete method:', error);
+            this.setError(error.response?.data || 'Failed to delete method');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    downloadMethod = async (filename) => {
+        this.setLoading(true);
+        try {
+            if (!filename) {
+                throw new Error('Filename is required for download');
+            }
+            const response = await axios.get(`http://localhost:5000/api/method/download/${filename}`, {
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to download method');
+        } finally {
+            this.setLoading(false);
         }
     }
 }
 
 export default MethodStore;
-

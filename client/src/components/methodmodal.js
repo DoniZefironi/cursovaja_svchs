@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 
-const MethodModal = ({ show, onHide, method, handleChange, handleSave, title, subjects, typeMethods }) => {
+const MethodModal = ({ show, onHide, method, handleChange, handleFileChange, handleSave, title, subjects = [], typeMethods = [] }) => {
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
@@ -58,7 +58,7 @@ const MethodModal = ({ show, onHide, method, handleChange, handleSave, title, su
             <Form.Label>File</Form.Label>
             <Form.Control
               type="file"
-              onChange={(e) => handleChange(e, 'url', true)}
+              onChange={handleFileChange}
             />
           </Form.Group>
           <Form.Group controlId="formMethodQuantityPages" className="mt-3">

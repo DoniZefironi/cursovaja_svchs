@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
-import userMain from './usermain';
 
 class SyllabusStore {
     syllabuses = [];

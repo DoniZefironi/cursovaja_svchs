@@ -23,6 +23,7 @@ const MethodContainer = observer(() => {
   const [currentMethod, setCurrentMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
   const [newMethod, setNewMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
   const [search, setSearch] = useState('');
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     fetchMethods(currentPage);
@@ -36,15 +37,31 @@ const MethodContainer = observer(() => {
 
   const handleCreate = () => {
     console.log("Creating new method:", newMethod);
-    createMethod(newMethod);
+    const formData = new FormData();
+    for (const key in newMethod) {
+      formData.append(key, newMethod[key]);
+    }
+    if (file) {
+      formData.append('file', file);
+    }
+    createMethod(formData);
     setShowCreateModal(false);
     setNewMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
+    setFile(null);
   };
 
   const handleEdit = () => {
-    updateMethod(currentMethod.id, currentMethod);
+    const formData = new FormData();
+    for (const key in currentMethod) {
+      formData.append(key, currentMethod[key]);
+    }
+    if (file) {
+      formData.append('file', file);
+    }
+    updateMethod(currentMethod.id, formData);
     setShowEditModal(false);
     setCurrentMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
+    setFile(null);
   };
 
   const handleDelete = (id) => {
@@ -58,6 +75,10 @@ const MethodContainer = observer(() => {
     } else {
       setCurrentMethod({ ...currentMethod, [key]: value });
     }
+  };
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
   const handleSearchSubmit = (e) => {
@@ -147,6 +168,7 @@ const MethodContainer = observer(() => {
         onHide={() => setShowCreateModal(false)}
         method={newMethod}
         handleChange={(e, key) => handleChange(e, key, true)}
+        handleFileChange={handleFileChange}
         handleSave={handleCreate}
         title="Создать новую запись"
         subjects={subjects}
@@ -154,17 +176,18 @@ const MethodContainer = observer(() => {
       />
 
       <MethodModal
-        show={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        method={currentMethod}
-        handleChange={handleChange}
-        handleSave={handleEdit}
-        title="Редактировать запись"
-        subjects={subjects}
-        typeMethods={typeMethods}
-      />
-    </div>
-  );
-});
+              show={showEditModal}
+              onHide={() => setShowEditModal(false)}
+              method={currentMethod}
+              handleChange={handleChange}
+              handleFileChange={handleFileChange}
+              handleSave={handleEdit}
+              title="Редактировать запись"
+              subjects={subjects}
+              typeMethods={typeMethods}
+            />
+          </div>
+        );
+      });
 
-export default MethodContainer;
+      export default MethodContainer;

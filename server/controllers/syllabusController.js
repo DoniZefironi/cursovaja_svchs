@@ -18,7 +18,7 @@ class SyllabusController {
             const fileName = uuid.v4() + path.extname(syllfile.name);
             const filePath = path.resolve(__dirname, '..', 'static', fileName);
 
-            await syllfile.mv(filePath); // Используем await для обработки ошибок
+            await syllfile.mv(filePath); 
             const syllabus = await Syllabus.create({ date, name, syllfile: fileName });
 
             return res.json(syllabus);
@@ -74,7 +74,7 @@ class SyllabusController {
             if (syllfile) {
                 fileName = uuid.v4() + path.extname(syllfile.name);
                 const filePath = path.resolve(__dirname, '..', 'static', fileName);
-                await syllfile.mv(filePath); // Используем await для обработки ошибок
+                await syllfile.mv(filePath); 
             }
 
             await syllabus.update({ date, name, syllfile: fileName });

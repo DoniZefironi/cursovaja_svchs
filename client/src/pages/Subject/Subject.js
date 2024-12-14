@@ -11,8 +11,8 @@ import ViewByDate from '../../components/viewbydate';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
 const SubjectContainer = observer(() => {
-  const { subject, user } = useContext(Context);  
-  const { subjects, fetchSubjects, createSubject, updateSubject } = subject;
+  const { subject, user } = useContext(Context);
+  const { subjects, fetchSubjects, createSubject, updateSubject, currentPage, totalPages, setPage } = subject;
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -20,8 +20,8 @@ const SubjectContainer = observer(() => {
   const [newSubject, setNewSubject] = useState({ name: '', description: '' });
 
   useEffect(() => {
-    fetchSubjects();
-  }, [fetchSubjects]);
+    fetchSubjects(currentPage);
+  }, [fetchSubjects, currentPage]);
 
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -49,6 +49,13 @@ const SubjectContainer = observer(() => {
     }
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setPage(newPage);
+      fetchSubjects(newPage);
+    }
+  };
+
   return (
     <div className='main'>
       <Container className="mt-4">
@@ -59,37 +66,54 @@ const SubjectContainer = observer(() => {
           <Col md={8}>
             <div className="content-box list-box width100">
               {subjects && subjects.length > 0 ? (
-                subjects.map((item, index) => (
-                  <div key={index} className="contentiks">
-                    <div className="list-item">
-                      <div>
-                        <h6>{item.name}</h6>
-                      </div>
-                      <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
-                        {openIndex === index ? <FaMinus /> : <FaPlus />}
-                      </Button>
-                      {user.user.roles.includes("ADMIN") && ( // Проверяем, что пользователь является администратором
-                        <Button
-                          variant="warning"
-                          onClick={() => {
-                            setCurrentSubject(item);
-                            setShowEditModal(true);
-                          }}
-                        >
-                          Изменить
+                <>
+                  {subjects.map((item, index) => (
+                    <div key={index} className="contentiks">
+                      <div className="list-item">
+                        <div>
+                          <h6>{item.name}</h6>
+                        </div>
+                        <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
+                          {openIndex === index ? <FaMinus /> : <FaPlus />}
                         </Button>
-                      )}
-                    </div>
-                    <Collapse in={openIndex === index}>
-                      <div className="additional-info">
-                        <p>{item.description}</p>
+                        {user.user.roles.includes("ADMIN") && ( // Проверяем, что пользователь является администратором
+                          <Button
+                            variant="warning"
+                            onClick={() => {
+                              setCurrentSubject(item);
+                              setShowEditModal(true);
+                            }}
+                          >
+                            Изменить
+                          </Button>
+                        )}
                       </div>
-                    </Collapse>
-                  </div>
-                ))
+                      <Collapse in={openIndex === index}>
+                        <div className="additional-info">
+                          <p>{item.description}</p>
+                        </div>
+                      </Collapse>
+                    </div>
+                  ))}
+                </>
               ) : (
                 <p>No subjects available</p>
               )}
+            </div>
+            <div className="pagination-controls mt-3">
+              <Button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span>{`Page ${currentPage} of ${totalPages}`}</span>
+              <Button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
             </div>
           </Col>
           <Col md={4}>

@@ -12,24 +12,24 @@ const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete
               <h6>{method.title}</h6>
               <p>{method.author} ({method.university}, {method.year_create})</p>
             </div>
-                          <div>
-                            <Button variant="link" onClick={() => handleDownload(method.syllfile)}>
-                              <FaFileDownload />
-                            </Button>
-                          </div>
+            <div>
+              <Button variant="link" onClick={() => handleDownload(method.url)}>
+                <FaFileDownload />
+              </Button>
+            </div>
             <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
               {openIndex === index ? <FaMinus /> : <FaPlus />}
             </Button>
             {currentUser.user.roles.includes("ADMIN") && (
-                <>
-            <Button variant="warning" className="mx-2" onClick={() => handleEdit(method)}>
-              <FaEdit />
-            </Button>
-            <Button variant="danger" onClick={() => handleDelete(method.id)}>
-              <FaTrash />
-            </Button>
-            </>
-              )}
+              <>
+                <Button variant="warning" className="mx-2" onClick={() => handleEdit(method)}>
+                  <FaEdit />
+                </Button>
+                <Button variant="danger" onClick={() => handleDelete(method.id)}>
+                  <FaTrash />
+                </Button>
+              </>
+            )}
           </div>
           <Collapse in={openIndex === index}>
             <div className="additional-info">
