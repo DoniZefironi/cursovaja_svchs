@@ -10,7 +10,6 @@ class MethodController {
         try {
             const { title, description, language, year_create, quantity_pages, subjectId, TypeMethodId, date_realese } = req.body;
 
-            // Check if a file was uploaded
             if (!req.files || !req.files.file) {
                 return next(ApiError.badRequest('No file uploaded'));
             }
@@ -130,7 +129,7 @@ class MethodController {
                 const filePath = path.resolve(__dirname, '..', 'static', url);
                 await urlFile.mv(filePath);
             } else {
-                url = met.url; // Preserve existing URL if no new file uploaded
+                url = met.url; 
             }
 
             await met.update({ title, description, language, year_create, url, quantity_pages, subjectId, TypeMethodId, date_realese });
