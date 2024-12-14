@@ -6,80 +6,78 @@ const fs = require('fs');
 const uuid = require('uuid');
 
 class MethodController {
+    async create(req, res, next) {
+        try {
+            const { title, description, language, year_create, quantity_pages, subjectId, TypeMethodId, date_realese } = req.body;
 
-        async create(req, res, next) {
-            try {
-                const { title, description, language, year_create, quantity_pages, subjectId, TypeMethodId, date_realese } = req.body;
-    
-                // Check if a file was uploaded
-                if (!req.files || !req.files.file) {
-                    return next(ApiError.badRequest('No file uploaded'));
-                }
-    
-                const file = req.files.file;
-                const fileName = `${uuid.v4()}${path.extname(file.name)}`;
-                const filePath = path.resolve(__dirname, '..', 'static', fileName);
-    
-                await file.mv(filePath);
-    
-                const methodological_rec = await Methodological_rec.create({ 
-                    title, 
-                    description, 
-                    language, 
-                    year_create, 
-                    quantity_pages, 
-                    subjectId, 
-                    TypeMethodId, 
-                    date_realese,
-                    url: fileName 
-                });
-    
-                return res.json(methodological_rec);
-            } catch (err) {
-                console.error('Error creating methodological record:', err);
-                return next(ApiError.internal('Failed to create methodological record'));
+            // Check if a file was uploaded
+            if (!req.files || !req.files.file) {
+                return next(ApiError.badRequest('No file uploaded'));
             }
+
+            const file = req.files.file;
+            const fileName = `${uuid.v4()}${path.extname(file.name)}`;
+            const filePath = path.resolve(__dirname, '..', 'static', fileName);
+
+            await file.mv(filePath);
+
+            const methodological_rec = await Methodological_rec.create({ 
+                title, 
+                description, 
+                language, 
+                year_create, 
+                quantity_pages, 
+                subjectId, 
+                TypeMethodId, 
+                date_realese,
+                url: fileName 
+            });
+
+            return res.json(methodological_rec);
+        } catch (err) {
+            console.error('Error creating methodological record:', err);
+            return next(ApiError.internal('Failed to create methodological record'));
         }
+    }
 
-            async getAll(req, res) {
-                try {
-                    const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
-                    const offset = (page - 1) * limit;
-                    const where = {};
-        
-                    if (search) {
-                        where[Op.or] = [
-                            { title: { [Op.like]: `%${search}%` } },
-                            { description: { [Op.like]: `%${search}%` } },
-                            { language: { [Op.like]: `%${search}%` } },
-                            { year_create: { [Op.like]: `%${search}%` } },
-                        ];
-                    }
-        
-                    for (const key in filter) {
-                        if (filter.hasOwnProperty(key)) {
-                            where[key] = filter[key];
-                        }
-                    }
-        
-                    const met = await Methodological_rec.findAndCountAll({
-                        where,
-                        limit,
-                        offset,
-                        order: [[sortBy, order]]
-                    });
-        
-                    return res.json({
-                        total: met.count,
-                        pages: Math.ceil(met.count / limit),
-                        data: met.rows
-                    });
-                } catch (error) {
-                    console.error('Failed to retrieve methodological records:', error);
-                    return res.status(500).json({ error: 'Failed to retrieve methodological records' });
+    async getAll(req, res) {
+        try {
+            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
+            const offset = (page - 1) * limit;
+            const where = {};
+
+            if (search) {
+                where[Op.or] = [
+                    { title: { [Op.like]: `%${search}%` } },
+                    { description: { [Op.like]: `%${search}%` } },
+                    { language: { [Op.like]: `%${search}%` } },
+                    { year_create: { [Op.like]: `%${search}%` } },
+                ];
+            }
+
+            for (const key in filter) {
+                if (filter.hasOwnProperty(key)) {
+                    where[key] = filter[key];
                 }
             }
-        
+
+            const met = await Methodological_rec.findAndCountAll({
+                where,
+                limit,
+                offset,
+                order: [[sortBy, order]]
+            });
+
+            return res.json({
+                total: met.count,
+                pages: Math.ceil(met.count / limit),
+                data: met.rows
+            });
+        } catch (error) {
+            console.error('Failed to retrieve methodological records:', error);
+            return res.status(500).json({ error: 'Failed to retrieve methodological records' });
+        }
+    }
 
     async getOne(req, res, next) {
         const { id } = req.query;
@@ -149,17 +147,21 @@ class MethodController {
             if (!query) {
                 return next(ApiError.badRequest('Search query not provided'));
             }
+    
             const isValidDate = !isNaN(Date.parse(query));
+            const isInteger = !isNaN(parseInt(query));
             const conditions = {
                 [Op.or]: [
                     { title: { [Op.like]: `%${query}%` } },
                     { url: { [Op.like]: `%${query}%` } },
                     { description: { [Op.like]: `%${query}%` } },
-                    { language: { [Op.like]: `%${query}%` } },
-                    { year_create: { [Op.like]: `%${query}%` } },
-                    { quantity_pages: { [Op.like]: `%${query}%` } },
+                    { language: { [Op.like]: `%${query}%` } }
                 ]
             };
+            if (isInteger) {
+                conditions[Op.or].push({ year_create: parseInt(query) });
+                conditions[Op.or].push({ quantity_pages: parseInt(query) });
+            }
             if (isValidDate) {
                 const date = new Date(query);
                 conditions[Op.or].push({
@@ -169,7 +171,7 @@ class MethodController {
                     }
                 });
             }
-            const met = await Syllabus.findAll({ where: conditions });
+            const met = await Methodological_rec.findAll({ where: conditions });
             if (met.length === 0) {
                 return next(ApiError.notFound('No methodological record found matching the query'));
             }
@@ -180,6 +182,7 @@ class MethodController {
             return next(ApiError.internal(err.message));
         }
     }
+    
 
     async downloadFile(req, res, next) {
         const { filename } = req.params;
