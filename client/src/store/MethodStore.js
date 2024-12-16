@@ -5,6 +5,7 @@ class MethodStore {
     methods = [];
     subjects = [];
     typeMethods = [];
+    users = [];
     searchQuery = '';
     currentPage = 1;
     totalPages = 1;
@@ -12,7 +13,7 @@ class MethodStore {
     error = null;
 
     constructor(userMain) {
-        this.userMain = userMain; 
+        this.userMain = userMain;
         makeAutoObservable(this);
     }
 
@@ -26,6 +27,10 @@ class MethodStore {
 
     setTypeMethods = (typeMethods) => {
         this.typeMethods = typeMethods;
+    }
+
+    setUsers = (users) => {
+        this.users = users;
     }
 
     setSearchQuery = (query) => {
@@ -52,7 +57,7 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/method/all', {
-                params: { page, limit: 10 }
+                params: { page, limit: 10 },
             });
             this.setMethods(response.data.data);
             this.setTotalPages(response.data.pages);
@@ -88,6 +93,18 @@ class MethodStore {
         }
     }
 
+    fetchUsers = async () => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/user/all', { withCredentials: true });
+            this.setUsers(response.data);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to fetch users');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
     searchMethods = async () => {
         if (!this.searchQuery) {
             this.setError('Search query not provided');
@@ -118,6 +135,52 @@ class MethodStore {
             this.setMethods([...this.methods, response.data]);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create method');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    fetchUserMethodologicals = async () => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/user_methodological/all', { withCredentials: true });
+            console.log('Fetched UserMethodologicals:', response.data);
+            return response.data;
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to fetch user methodologicals');
+            throw error;
+        } finally {
+            this.setLoading(false);
+        }
+    }
+       
+
+    searchUserMethodologicals = async (query) => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/user_methodological/search', {
+                params: { query },
+                withCredentials: true
+            });
+            this.setMethods(response.data);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to search user methodologicals');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    createUserMethodological = async (formData) => {
+        this.setLoading(true);
+        try {
+            const response = await axios.post('http://localhost:5000/api/user_methodological/create', formData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log('UserMethodological created:', response.data);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to create user methodological');
         } finally {
             this.setLoading(false);
         }

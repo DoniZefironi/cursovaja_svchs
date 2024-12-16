@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Collapse } from 'react-bootstrap';
-import { FaFileDownload, FaPlus, FaMinus, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaFileDownload, FaPlus, FaMinus, FaEdit, FaTrash, FaUserPlus, FaUsers } from 'react-icons/fa';
 
-const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete, currentUser, handleDownload }) => {
+const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete, currentUser, handleDownload, handleCreateUserMethodological, handleViewUserMethodological }) => {
   return (
     <div className="content-box list-box">
       {methods.map((method, index) => (
@@ -22,6 +22,12 @@ const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete
             </Button>
             {currentUser.user.roles.includes("ADMIN") && (
               <>
+                <Button variant="primary" className="mx-2" onClick={() => handleCreateUserMethodological(method.id)}>
+                  <FaUserPlus />
+                </Button>
+                <Button variant="info" className="mx-2" onClick={() => handleViewUserMethodological(method.id)}>
+                  <FaUsers />
+                </Button>
                 <Button variant="warning" className="mx-2" onClick={() => handleEdit(method)}>
                   <FaEdit />
                 </Button>

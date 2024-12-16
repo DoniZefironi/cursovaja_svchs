@@ -7,36 +7,43 @@ import { observer } from 'mobx-react-lite';
 import { Context } from '../../index';
 import MethodList from '../../components/methodlist';
 import MethodModal from '../../components/methodmodal';
+import UserMethodologicalModal from '../../components/userMethodologicalModal';
+import SelectUserModal from '../../components/selectUserModal';
 
 const MethodContainer = observer(() => {
-  const { method, user: currentUser } = useContext(Context);
+  const { method, user: currentUser, author } = useContext(Context);
 
   if (!method) {
     return <div>Loading...</div>;
   }
 
-  const { methods, fetchMethods, createMethod, updateMethod, deleteMethod, searchMethods, setSearchQuery, currentPage, totalPages, subjects, typeMethods, fetchSubjects, fetchTypeMethods, downloadMethod } = method;
-  
+  const { methods, fetchMethods, createMethod, updateMethod, deleteMethod, searchMethods, setSearchQuery, currentPage, totalPages, subjects, typeMethods, fetchSubjects, fetchTypeMethods, downloadMethod, createUserMethodological, fetchUserMethodologicals } = method;
+  const { users, fetchUsers } = author;
+
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showUserMethodModal, setShowUserMethodModal] = useState(false);
+  const [showSelectUserModal, setShowSelectUserModal] = useState(false);
   const [currentMethod, setCurrentMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
   const [newMethod, setNewMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
   const [search, setSearch] = useState('');
   const [file, setFile] = useState(null);
+  const [userMethodologicals, setUserMethodologicals] = useState([]);
+  const [selectedMethodId, setSelectedMethodId] = useState(null);
 
   useEffect(() => {
     fetchMethods(currentPage);
     fetchSubjects();
     fetchTypeMethods();
-  }, [fetchMethods, fetchSubjects, fetchTypeMethods, currentPage]);
+    fetchUsers();
+  }, [fetchMethods, fetchSubjects, fetchTypeMethods, fetchUsers, currentPage]);
 
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   const handleCreate = () => {
-    console.log("Creating new method:", newMethod);
     const formData = new FormData();
     for (const key in newMethod) {
       formData.append(key, newMethod[key]);
@@ -93,6 +100,37 @@ const MethodContainer = observer(() => {
     }
   };
 
+  const handleCreateUserMethodological = (methodId) => {
+    setSelectedMethodId(methodId);
+    setShowSelectUserModal(true);
+  };
+
+  const handleSelectUser = (userId) => {
+    const formData = { userId: parseInt(userId, 10), methodologicalId: parseInt(selectedMethodId, 10) };
+    console.log('Sending data to server:', formData);
+    createUserMethodological(formData);
+    setShowSelectUserModal(false);
+    setSelectedMethodId(null);
+  };
+
+  const handleViewUserMethodological = async (methodId) => {
+    try {
+      const userMethodologicals = await fetchUserMethodologicals();
+      if (userMethodologicals && Array.isArray(userMethodologicals)) {
+        const filteredUserMethodologicals = userMethodologicals.filter((um) => um.methodologicalRecId === methodId);
+        console.log('Filtered UserMethodologicals:', filteredUserMethodologicals);
+        setUserMethodologicals(filteredUserMethodologicals);
+      } else {
+        console.error('UserMethodologicals data is not an array or is undefined');
+      }
+      setShowUserMethodModal(true);
+    } catch (error) {
+      console.error('Error fetching UserMethodologicals:', error);
+    }
+  };
+  
+  
+
   return (
     <div className='main'>
       <Container className="mt-4">
@@ -112,6 +150,8 @@ const MethodContainer = observer(() => {
               }}
               handleDelete={handleDelete}
               handleDownload={downloadMethod}
+              handleCreateUserMethodological={handleCreateUserMethodological}
+              handleViewUserMethodological={handleViewUserMethodological}
             />
             <div className="pagination-controls">
               <Button
@@ -176,18 +216,31 @@ const MethodContainer = observer(() => {
       />
 
       <MethodModal
-              show={showEditModal}
-              onHide={() => setShowEditModal(false)}
-              method={currentMethod}
-              handleChange={handleChange}
-              handleFileChange={handleFileChange}
-              handleSave={handleEdit}
-              title="Редактировать запись"
-              subjects={subjects}
-              typeMethods={typeMethods}
-            />
-          </div>
-        );
-      });
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        method={currentMethod}
+        handleChange={handleChange}
+        handleFileChange={handleFileChange}
+        handleSave={handleEdit}
+        title="Редактировать запись"
+        subjects={subjects}
+        typeMethods={typeMethods}
+      />
 
-      export default MethodContainer;
+      <UserMethodologicalModal
+        show={showUserMethodModal}
+        onHide={() => setShowUserMethodModal(false)}
+        userMethodologicals={userMethodologicals}
+      />
+
+      <SelectUserModal
+        show={showSelectUserModal}
+        onHide={() => setShowSelectUserModal(false)}
+        users={users}
+        onSelectUser={handleSelectUser}
+      />
+    </div>
+  );
+});
+
+export default MethodContainer;

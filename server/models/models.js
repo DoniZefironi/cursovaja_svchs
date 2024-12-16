@@ -1,16 +1,16 @@
-const sequelize = require('../db');
 const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
 
 const User = sequelize.define('user', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false },
     surname: { type: DataTypes.STRING, allowNull: false },
-    patronymic: { type: DataTypes.STRING, allowNull: true }, 
+    patronymic: { type: DataTypes.STRING, allowNull: true },
     phone_number: { type: DataTypes.STRING },
     email: { type: DataTypes.STRING, unique: true, allowNull: false },
     password: { type: DataTypes.STRING, allowNull: false },
     roles: { type: DataTypes.STRING, defaultValue: "USER" },
-    position: { type: DataTypes.STRING, allowNull: true }  
+    position: { type: DataTypes.STRING, allowNull: true }
 });
 
 const Refresh_Token = sequelize.define('refresh_token', {
@@ -28,7 +28,7 @@ const Syllabus = sequelize.define('syllabus', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     date: { type: DataTypes.DATE, allowNull: false },
     syllfile: { type: DataTypes.STRING, allowNull: false },
-    name: { type: DataTypes.STRING, allowNull: true }  
+    name: { type: DataTypes.STRING, allowNull: true }
 });
 
 const Form_study = sequelize.define('form_study', {
@@ -59,13 +59,16 @@ const Methodological_rec = sequelize.define('methodological_rec', {
 });
 
 const User_methodological = sequelize.define('user_methodological', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: User, key: 'id' } },
+    methodologicalRecId: { type: DataTypes.INTEGER, allowNull: false, references: { model: Methodological_rec, key: 'id' } }
 });
 
 const Speciality_method = sequelize.define('speciality_method', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
 });
 
+// Ассоциации
 Syllabus.hasMany(Subject);
 Subject.belongsTo(Syllabus);
 
@@ -81,8 +84,11 @@ Methodological_rec.belongsTo(Subject);
 User.hasOne(Refresh_Token, { foreignKey: 'id_user', sourceKey: 'id' });
 Refresh_Token.belongsTo(User, { foreignKey: 'id_user', targetKey: 'id' });
 
-Methodological_rec.belongsToMany(User, { through: User_methodological });
-User.belongsToMany(Methodological_rec, { through: User_methodological });
+User.belongsToMany(Methodological_rec, { through: User_methodological, foreignKey: 'userId' });
+Methodological_rec.belongsToMany(User, { through: User_methodological, foreignKey: 'methodologicalRecId' });
+
+User_methodological.belongsTo(User, { foreignKey: 'userId' });
+User_methodological.belongsTo(Methodological_rec, { foreignKey: 'methodologicalRecId' });
 
 Methodological_rec.belongsToMany(Speciality, { through: Speciality_method });
 Speciality.belongsToMany(Methodological_rec, { through: Speciality_method });
