@@ -65,7 +65,9 @@ const User_methodological = sequelize.define('user_methodological', {
 });
 
 const Speciality_method = sequelize.define('speciality_method', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    specialityId: { type: DataTypes.INTEGER, references: { model: 'specialities', key: 'id' }, allowNull: false },
+    methodologicalRecId: { type: DataTypes.INTEGER, references: { model: 'methodological_recs', key: 'id' }, allowNull: false }
 });
 
 // Ассоциации
@@ -90,8 +92,11 @@ Methodological_rec.belongsToMany(User, { through: User_methodological, foreignKe
 User_methodological.belongsTo(User, { foreignKey: 'userId' });
 User_methodological.belongsTo(Methodological_rec, { foreignKey: 'methodologicalRecId' });
 
-Methodological_rec.belongsToMany(Speciality, { through: Speciality_method });
-Speciality.belongsToMany(Methodological_rec, { through: Speciality_method });
+Methodological_rec.belongsToMany(Speciality, { through: Speciality_method, foreignKey: 'methodologicalRecId' });
+Speciality.belongsToMany(Methodological_rec, { through: Speciality_method, foreignKey: 'specialityId' });
+
+Speciality_method.belongsTo(Speciality, { foreignKey: 'specialityId' });
+Speciality_method.belongsTo(Methodological_rec, { foreignKey: 'methodologicalRecId' });
 
 module.exports = {
     User,

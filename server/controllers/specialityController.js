@@ -12,42 +12,17 @@ class SpecialityController {
         }
     }
 
-    async getAll(req, res) {
-        try {
-            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
-            const offset = (page - 1) * limit;
-            const where = {};
-
-            if (search) {
-                where[Op.or] = [
-                    { code: { [Op.like]: `%${search}%` } },
-                    { qualification: { [Op.like]: `%${search}%` } },
-                    { formStudyId: { [Op.like]: `%${search}%` } }
-                ];
+        async getAll(req, res) {
+            try {
+                const specialities = await Speciality.findAll();
+                console.log('Fetched Specialities from DB:', specialities); // Логирование данных
+                return res.json(specialities);
+            } catch (error) {
+                console.log('Error fetching specialities:', error);
+                return res.status(500).json({ error: 'Failed to retrieve specialities' });
             }
-
-            for (const key in filter) {
-                if (filter.hasOwnProperty(key)) {
-                    where[key] = filter[key];
-                }
-            }
-
-            const specialities = await Speciality.findAndCountAll({
-                where,
-                limit,
-                offset,
-                order: [[sortBy, order]]
-            });
-
-            return res.json({
-                total: specialities.count,
-                pages: Math.ceil(specialities.count / limit),
-                data: specialities.rows
-            });
-        } catch (error) {
-            return res.status(500).json({ error: 'Failed to retrieve specialities' });
         }
-    }
+    
 
     async getOne(req, res, next) {
         const { id } = req.query;

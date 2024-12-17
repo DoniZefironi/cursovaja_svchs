@@ -6,6 +6,7 @@ class MethodStore {
     subjects = [];
     typeMethods = [];
     users = [];
+    specialities = [];
     searchQuery = '';
     currentPage = 1;
     totalPages = 1;
@@ -31,6 +32,10 @@ class MethodStore {
 
     setUsers = (users) => {
         this.users = users;
+    }
+
+    setSpecialities = (specialities) => {
+        this.specialities = specialities;
     }
 
     setSearchQuery = (query) => {
@@ -103,7 +108,7 @@ class MethodStore {
         } finally {
             this.setLoading(false);
         }
-    }
+    }   
 
     searchMethods = async () => {
         if (!this.searchQuery) {
@@ -153,7 +158,6 @@ class MethodStore {
             this.setLoading(false);
         }
     }
-       
 
     searchUserMethodologicals = async (query) => {
         this.setLoading(true);
@@ -181,6 +185,51 @@ class MethodStore {
             console.log('UserMethodological created:', response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create user methodological');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    fetchSpecialityMethodologicals = async () => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/speciality_method/all', { withCredentials: true });
+            console.log('Fetched SpecialityMethodologicals:', response.data);
+            return response.data;
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to fetch speciality methodologicals');
+            throw error;
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    searchSpecialityMethodologicals = async (query) => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/speciality_method/search', {
+                params: { query },
+                withCredentials: true
+            });
+            this.setMethods(response.data);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to search speciality methodologicals');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    createSpecialityMethodological = async (formData) => {
+        this.setLoading(true);
+        try {
+            const response = await axios.post('http://localhost:5000/api/speciality_method/create', formData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log('SpecialityMethodological created:', response.data);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to create speciality methodological');
         } finally {
             this.setLoading(false);
         }

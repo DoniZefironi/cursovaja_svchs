@@ -4,8 +4,8 @@ const ApiError = require('../error/ApiError');
 class SpecialityMethodsController {
     async create(req, res, next) {
         try {
-            const { specialityId, methodologicalId } = req.body;
-            const specialityMethod = await Speciality_method.create({ specialityId, methodologicalId });
+            const { specialityId, methodologicalRecId } = req.body;
+            const specialityMethod = await Speciality_method.create({ specialityId, methodologicalRecId });
             return res.json(specialityMethod);
         } catch (error) {
             next(ApiError.internal(error.message));
@@ -37,13 +37,13 @@ class SpecialityMethodsController {
     async updateOne(req, res, next) {
         try {
             const { id } = req.params;
-            const { specialityId, methodologicalId } = req.body;
+            const { specialityId, methodologicalRecId } = req.body;
             const specialityMethod = await Speciality_method.findByPk(id);
             if (!specialityMethod) {
                 return next(ApiError.notFound('Speciality method not found'));
             }
             specialityMethod.specialityId = specialityId;
-            specialityMethod.methodologicalId = methodologicalId;
+            specialityMethod.methodologicalRecId = methodologicalRecId;
             await specialityMethod.save();
             return res.json(specialityMethod);
         } catch (error) {

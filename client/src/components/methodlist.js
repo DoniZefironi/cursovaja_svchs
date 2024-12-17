@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Collapse } from 'react-bootstrap';
-import { FaFileDownload, FaPlus, FaMinus, FaEdit, FaTrash, FaUserPlus, FaUsers } from 'react-icons/fa';
+import { FaFileDownload, FaPlus, FaMinus, FaEdit, FaTrash, FaUserPlus, FaUsers, FaClipboardList, FaClipboard } from 'react-icons/fa';
 
-const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete, currentUser, handleDownload, handleCreateUserMethodological, handleViewUserMethodological }) => {
+const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete, currentUser, handleDownload, handleCreateUserMethodological, handleViewUserMethodological, handleCreateSpecialityMethodological, handleViewSpecialityMethodological }) => {
   return (
     <div className="content-box list-box">
       {methods.map((method, index) => (
@@ -33,6 +33,12 @@ const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete
                 </Button>
                 <Button variant="danger" onClick={() => handleDelete(method.id)}>
                   <FaTrash />
+                </Button>
+                <Button variant="success" className="mx-2" onClick={() => handleCreateSpecialityMethodological(method.id)}>
+                  <FaClipboardList />
+                </Button>
+                <Button variant="primary" className="mx-2" onClick={() => handleViewSpecialityMethodological(method.id)}>
+                  <FaClipboard />
                 </Button>
               </>
             )}

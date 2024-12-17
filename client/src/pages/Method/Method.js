@@ -9,9 +9,11 @@ import MethodList from '../../components/methodlist';
 import MethodModal from '../../components/methodmodal';
 import UserMethodologicalModal from '../../components/userMethodologicalModal';
 import SelectUserModal from '../../components/selectUserModal';
-
+import SelectSpecialityModal from '../../components/selectSpecialityModal';
+import SpecialityMethodologicalModal from '../../components/specialityMethodologicalModal';
+import { toJS } from 'mobx';
 const MethodContainer = observer(() => {
-  const { method, user: currentUser, author } = useContext(Context);
+  const { method, user: currentUser, author, specialityMethod } = useContext(Context);
 
   if (!method) {
     return <div>Loading...</div>;
@@ -19,26 +21,34 @@ const MethodContainer = observer(() => {
 
   const { methods, fetchMethods, createMethod, updateMethod, deleteMethod, searchMethods, setSearchQuery, currentPage, totalPages, subjects, typeMethods, fetchSubjects, fetchTypeMethods, downloadMethod, createUserMethodological, fetchUserMethodologicals } = method;
   const { users, fetchUsers } = author;
+  const { specialities, fetchSpecialities, createSpecialityMethodological, fetchSpecialityMethodologicals } = specialityMethod;
 
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showUserMethodModal, setShowUserMethodModal] = useState(false);
   const [showSelectUserModal, setShowSelectUserModal] = useState(false);
+  const [showSelectSpecialityModal, setShowSelectSpecialityModal] = useState(false);
+  const [showSpecialityMethodModal, setShowSpecialityMethodModal] = useState(false);
   const [currentMethod, setCurrentMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
   const [newMethod, setNewMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
   const [search, setSearch] = useState('');
   const [file, setFile] = useState(null);
   const [userMethodologicals, setUserMethodologicals] = useState([]);
+  const [specialityMethodologicals, setSpecialityMethodologicals] = useState([]);
   const [selectedMethodId, setSelectedMethodId] = useState(null);
 
   useEffect(() => {
-    fetchMethods(currentPage);
-    fetchSubjects();
-    fetchTypeMethods();
-    fetchUsers();
-  }, [fetchMethods, fetchSubjects, fetchTypeMethods, fetchUsers, currentPage]);
-
+      fetchMethods(currentPage);
+      fetchSubjects();
+      fetchTypeMethods();
+      fetchUsers();
+      fetchSpecialities(); // Убедимся, что метод вызывается
+  }, [fetchMethods, fetchSubjects, fetchTypeMethods, fetchUsers, fetchSpecialities, currentPage]);
+  
+  console.log('Specialities before conversion:', specialities);
+  const specialitiesArray = toJS(specialities);
+  console.log('Specialities after conversion:', specialitiesArray);
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
@@ -114,22 +124,31 @@ const MethodContainer = observer(() => {
   };
 
   const handleViewUserMethodological = async (methodId) => {
-    try {
-      const userMethodologicals = await fetchUserMethodologicals();
-      if (userMethodologicals && Array.isArray(userMethodologicals)) {
-        const filteredUserMethodologicals = userMethodologicals.filter((um) => um.methodologicalRecId === methodId);
-        console.log('Filtered UserMethodologicals:', filteredUserMethodologicals);
-        setUserMethodologicals(filteredUserMethodologicals);
-      } else {
-        console.error('UserMethodologicals data is not an array or is undefined');
-      }
-      setShowUserMethodModal(true);
-    } catch (error) {
-      console.error('Error fetching UserMethodologicals:', error);
-    }
+    const userMethodologicals = await fetchUserMethodologicals();
+    const filteredUserMethodologicals = userMethodologicals.filter((um) => um.methodologicalRecId === methodId);
+    setUserMethodologicals(filteredUserMethodologicals);
+    setShowUserMethodModal(true);
   };
-  
-  
+
+  const handleCreateSpecialityMethodological = (methodId) => {
+    setSelectedMethodId(methodId);
+    setShowSelectSpecialityModal(true);
+  };
+
+  const handleSelectSpeciality = (specialityId) => {
+    const formData = { specialityId: parseInt(specialityId, 10), methodologicalRecId: parseInt(selectedMethodId, 10) };
+    console.log('Sending data to server:', formData); // Логирование данных перед отправкой
+    createSpecialityMethodological(formData);
+    setShowSelectSpecialityModal(false);
+    setSelectedMethodId(null);
+};
+
+  const handleViewSpecialityMethodological = async (methodId) => {
+    const specialityMethodologicals = await fetchSpecialityMethodologicals();
+    const filteredSpecialityMethodologicals = specialityMethodologicals.filter((sm) => sm.methodologicalRecId === methodId);
+    setSpecialityMethodologicals(filteredSpecialityMethodologicals);
+    setShowSpecialityMethodModal(true);
+  };
 
   return (
     <div className='main'>
@@ -152,6 +171,8 @@ const MethodContainer = observer(() => {
               handleDownload={downloadMethod}
               handleCreateUserMethodological={handleCreateUserMethodological}
               handleViewUserMethodological={handleViewUserMethodological}
+              handleCreateSpecialityMethodological={handleCreateSpecialityMethodological}
+              handleViewSpecialityMethodological={handleViewSpecialityMethodological}
             />
             <div className="pagination-controls">
               <Button
@@ -197,6 +218,10 @@ const MethodContainer = observer(() => {
               <div className="report-section mt-3">
                 <h5>Отчет</h5>
                 <Button variant="light" className="download-button">Скачать</Button>
+                </div>
+                <div className="report-section mt-3">
+                <h5>Отчет</h5>
+                <Button variant="light" className="download-button">Скачать</Button>
               </div>
             </div>
           </Col>
@@ -238,6 +263,19 @@ const MethodContainer = observer(() => {
         onHide={() => setShowSelectUserModal(false)}
         users={users}
         onSelectUser={handleSelectUser}
+      />
+
+<SelectSpecialityModal
+      show={showSelectSpecialityModal}
+      onHide={() => setShowSelectSpecialityModal(false)}
+      specialities={specialitiesArray} // Преобразование данных из Proxy
+      onSelectSpeciality={handleSelectSpeciality}
+  />
+  
+      <SpecialityMethodologicalModal
+        show={showSpecialityMethodModal}
+        onHide={() => setShowSpecialityMethodModal(false)}
+        specialityMethodologicals={specialityMethodologicals}
       />
     </div>
   );

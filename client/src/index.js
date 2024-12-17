@@ -6,14 +6,16 @@ import reportWebVitals from './reportWebVitals';
 import UserMain from './store/usermain';
 import SubjectStore from './store/SubjectStore';
 import MethodStore from './store/MethodStore';
-import SyllabusStore from './store/syllabusstore';  
+import SyllabusStore from './store/syllabusstore';
 import UserStore from './store/userstore';
+import SpecialityStore from './store/SpecialityStore'; 
 
 const userStore = new UserMain();
 const subjectStore = new SubjectStore();
 const methodStore = new MethodStore();
 const syllabusStore = new SyllabusStore();
 const authorStore = new UserStore();
+const specialityStore = new SpecialityStore(); 
 
 export const Context = createContext({
     user: userStore,
@@ -21,6 +23,7 @@ export const Context = createContext({
     method: methodStore,
     syllabus: syllabusStore,
     author: authorStore,
+    specialityMethod: specialityStore, 
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -31,6 +34,7 @@ root.render(
     method: methodStore,
     syllabus: syllabusStore,
     author: authorStore,
+    specialityMethod: specialityStore, 
   }}>
     <App />
   </Context.Provider>
