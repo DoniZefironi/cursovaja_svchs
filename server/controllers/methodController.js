@@ -9,17 +9,18 @@ class MethodController {
     async create(req, res, next) {
         try {
             const { title, description, language, year_create, quantity_pages, subjectId, TypeMethodId, date_realese } = req.body;
-
+    
             if (!req.files || !req.files.file) {
+                console.error('No file uploaded');
                 return next(ApiError.badRequest('No file uploaded'));
             }
-
+    
             const file = req.files.file;
             const fileName = `${uuid.v4()}${path.extname(file.name)}`;
             const filePath = path.resolve(__dirname, '..', 'static', fileName);
-
+    
             await file.mv(filePath);
-
+    
             const methodological_rec = await Methodological_rec.create({ 
                 title, 
                 description, 
@@ -31,20 +32,22 @@ class MethodController {
                 date_realese,
                 url: fileName 
             });
-
+    
             return res.json(methodological_rec);
         } catch (err) {
             console.error('Error creating methodological record:', err);
             return next(ApiError.internal('Failed to create methodological record'));
         }
     }
+    
+    
 
     async getAll(req, res) {
         try {
-            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
+            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {}, year } = req.query;
             const offset = (page - 1) * limit;
             const where = {};
-
+    
             if (search) {
                 where[Op.or] = [
                     { title: { [Op.like]: `%${search}%` } },
@@ -53,20 +56,24 @@ class MethodController {
                     { year_create: { [Op.like]: `%${search}%` } },
                 ];
             }
-
+    
+            if (year) {
+                where.year_create = year;
+            }
+    
             for (const key in filter) {
                 if (filter.hasOwnProperty(key)) {
                     where[key] = filter[key];
                 }
             }
-
+    
             const met = await Methodological_rec.findAndCountAll({
                 where,
                 limit,
                 offset,
                 order: [[sortBy, order]]
             });
-
+    
             return res.json({
                 total: met.count,
                 pages: Math.ceil(met.count / limit),
@@ -77,6 +84,7 @@ class MethodController {
             return res.status(500).json({ error: 'Failed to retrieve methodological records' });
         }
     }
+    
 
     async getOne(req, res, next) {
         const { id } = req.query;

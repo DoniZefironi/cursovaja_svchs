@@ -5,8 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './syllabus.css';
 import { Context } from '../../index';
 import SearchSyllabus from '../../components/searchsyllabus';
-import Report from '../../components/report';
-import ViewByAuthor from '../../components/viewbyauthor';
+import ViewByDate from '../../components/viewbydate';
 import SyllabusList from '../../components/syllabuslist';
 import SyllabusModal from '../../components/syllabusmodal';
 
@@ -19,13 +18,8 @@ const SyllabusContainer = observer(() => {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    console.log("Calling fetchSyllabuses...");
     fetchSyllabuses(currentPage);
   }, [fetchSyllabuses, currentPage]);
-
-  useEffect(() => {
-    console.log("Syllabuses fetched:", syllabuses);
-  }, [syllabuses]);
 
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -42,6 +36,7 @@ const SyllabusContainer = observer(() => {
     createSyllabus(formData);
     setShowModal(false);
     setCurrentSyllabus({ id: null, name: '', date: '', syllfile: '' });
+    window.location.reload();  
   };
 
   const handleEdit = () => {
@@ -55,6 +50,7 @@ const SyllabusContainer = observer(() => {
     updateSyllabus(currentSyllabus.id, formData);
     setShowModal(false);
     setCurrentSyllabus({ id: null, name: '', date: '', syllfile: '' });
+    window.location.reload();  
   };
 
   const handleChange = (e, key, isFile = false) => {
@@ -84,7 +80,7 @@ const SyllabusContainer = observer(() => {
         )}
         <Row className='gapchek'>
           <Col md={8}>
-          <SyllabusList
+            <SyllabusList
               syllabuses={syllabuses}
               currentUser={currentUser}
               handleToggle={handleToggle}
@@ -116,9 +112,8 @@ const SyllabusContainer = observer(() => {
               <SearchSyllabus />
               <div className="filter-section">
                 <h5>Просмотр</h5>
-                <ViewByAuthor />
+                <ViewByDate />
               </div>
-              <Report />
             </div>
           </Col>
         </Row>

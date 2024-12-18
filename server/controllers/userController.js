@@ -19,7 +19,7 @@ class UserController {
             const users = await User.findAll({
                 where: {
                     [Op.or]: [
-                        { name: { [Op.like]: `%${query}%` } }, // Corrected placeholder
+                        { name: { [Op.like]: `%${query}%` } }, 
                         { surname: { [Op.like]: `%${query}%` } },
                         { email: { [Op.like]: `%${query}%` } },
                         { patronymic: { [Op.like]: `%${query}%` } }
@@ -162,7 +162,7 @@ class UserController {
             return res.json(userData);
         } catch (e) {
             console.error('Registration error:', e);
-            next(ApiError.internal(e.message)); // Corrected method name
+            next(ApiError.internal(e.message)); 
         }
     }     
 
@@ -178,14 +178,14 @@ class UserController {
             return res.json(userData);
         } catch (e) {
             console.error("Login error:", e);
-            next(ApiError.internal(e.message)); // Corrected method name
+            next(ApiError.internal(e.message)); 
         }
     }
 
     async logout(req, res, next) {
         try {
             const { refreshToken } = req.cookies;
-            console.log("Received refresh token for logout:", refreshToken); // Логирование токена
+            console.log("Received refresh token for logout:", refreshToken); 
             if (!refreshToken) {
                 throw ApiError.badRequest("Refresh token not provided");
             }
@@ -193,8 +193,8 @@ class UserController {
             res.clearCookie('refreshToken');
             return res.json(token);
         } catch (e) {
-            console.error("Logout error:", e); // Логирование ошибки
-            next(ApiError.internal(e.message)); // Corrected method name
+            console.error("Logout error:", e); 
+            next(ApiError.internal(e.message)); 
         }
     }
 
@@ -211,7 +211,7 @@ class UserController {
             return res.json(userData);
         } catch (e) {
             console.error("Refresh error:", e); 
-            next(ApiError.internal(e.message)); // Corrected method name
+            next(ApiError.internal(e.message)); 
         }
     }
 }

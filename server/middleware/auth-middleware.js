@@ -6,7 +6,6 @@ module.exports = function (req, res, next)  {
         if(!authorization){
             return next(ApiError.unauthorized("Пользователь не авторизован"))
         }
-        // bearer accessToken
         const accessToken = authorization.split(' ')[1]
 
         if(!accessToken){

@@ -26,11 +26,11 @@ class SpecialityStore {
         this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/speciality/all', { withCredentials: true });
-            console.log('Fetched Specialities from API:', response.data); // Логирование данных
+            console.log('Fetched Specialities from API:', response.data); 
             this.setSpecialities(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch specialities');
-            console.log('Error fetching specialities:', error); // Логирование ошибок
+            console.log('Error fetching specialities:', error); 
         } finally {
             this.setLoading(false);
         }
@@ -45,10 +45,10 @@ class SpecialityStore {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log('SpecialityMethodological created:', response.data); // Логирование данных
+            console.log('SpecialityMethodological created:', response.data); 
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create speciality methodological');
-            console.log('Error creating speciality methodological:', error); // Логирование ошибки
+            console.log('Error creating speciality methodological:', error); 
         } finally {
             this.setLoading(false);
         }

@@ -11,7 +11,7 @@ class SyllabusStore {
     error = null;
 
     constructor(userMain) {
-        this.userMain = userMain; // Сохраняем экземпляр UserMain
+        this.userMain = userMain; 
         makeAutoObservable(this);
     }
 
@@ -134,19 +134,33 @@ class SyllabusStore {
         }
     }
 
-    // Новый метод для скачивания файла
+    fetchSyllabusesByYear = async (year, page = 1) => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/syllabus/all', {
+                params: { year, page, limit: 10 }
+            });
+            this.setSyllabuses(response.data.data);
+            this.setTotalPages(response.data.pages);
+            this.setPage(page);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to fetch syllabuses');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
     downloadSyllabus = async (filename) => {
         this.setLoading(true);
         try {
             const response = await axios.get(`http://localhost:5000/api/syllabus/download/${filename}`, {
-                responseType: 'blob' // Указываем, что ожидаем бинарные данные
+                responseType: 'blob' 
             });
 
-            // Создаем URL для скачивания файла
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', filename); // Указываем имя файла
+            link.setAttribute('download', filename); 
             document.body.appendChild(link);
             link.click();
             link.remove();

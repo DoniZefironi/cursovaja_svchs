@@ -5,9 +5,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './subject.css';
 import { Context } from '../../index';
 import Search from '../../components/search';
-import Report from '../../components/report';
-import ViewByAuthor from '../../components/viewbyauthor';
-import ViewByDate from '../../components/viewbydate';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
 const SubjectContainer = observer(() => {
@@ -31,13 +28,14 @@ const SubjectContainer = observer(() => {
     createSubject(newSubject.name, newSubject.description);
     setShowCreateModal(false);
     setNewSubject({ name: '', description: '' });
+    window.location.reload();  
   };
 
   const handleEdit = () => {
     updateSubject(currentSubject.id, currentSubject.name, currentSubject.description);
     setShowEditModal(false);
     setCurrentSubject({ id: null, name: '', description: '' });
-    window.location.reload();  // Перезагрузка страницы после успешного обновления
+    window.location.reload();  
   };
 
   const handleChange = (e, key, isNew = false) => {
@@ -59,7 +57,7 @@ const SubjectContainer = observer(() => {
   return (
     <div className='main'>
       <Container className="mt-4">
-        {user.user.roles.includes("ADMIN") && ( // Проверяем, что пользователь является администратором
+        {user.user.roles.includes("ADMIN") && ( 
           <Button variant="primary" onClick={() => setShowCreateModal(true)}>Создать</Button>
         )}
         <Row className='gapchek'>
@@ -76,7 +74,7 @@ const SubjectContainer = observer(() => {
                         <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
                           {openIndex === index ? <FaMinus /> : <FaPlus />}
                         </Button>
-                        {user.user.roles.includes("ADMIN") && ( // Проверяем, что пользователь является администратором
+                        {user.user.roles.includes("ADMIN") && ( 
                           <Button
                             variant="warning"
                             onClick={() => {
@@ -119,18 +117,11 @@ const SubjectContainer = observer(() => {
           <Col md={4}>
             <div className="content-box filter-box">
               <Search />
-              <div className="filter-section">
-                <h5>Просмотр</h5>
-                <ViewByAuthor />
-                <ViewByDate />
-              </div>
-              <Report />
             </div>
           </Col>
         </Row>
       </Container>
 
-      {/* Модальное окно для создания новой записи */}
       <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Создать новую запись</Modal.Title>
@@ -164,7 +155,6 @@ const SubjectContainer = observer(() => {
         </Modal.Footer>
       </Modal>
 
-      {/* Модальное окно для редактирования записи */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Редактировать запись</Modal.Title>

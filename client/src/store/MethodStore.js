@@ -58,6 +58,22 @@ class MethodStore {
         this.error = error;
     }
 
+fetchMethodsByYear = async (year, page = 1) => {
+    this.setLoading(true);
+    try {
+        const response = await axios.get('http://localhost:5000/api/method/all', {
+            params: { year, page, limit: 10 }
+        });
+        this.setMethods(response.data.data);
+        this.setTotalPages(response.data.pages);
+        this.setPage(page);
+    } catch (error) {
+        this.setError(error.response?.data || 'Failed to fetch methods');
+    } finally {
+        this.setLoading(false);
+    }
+}
+
     fetchMethods = async (page = 1) => {
         this.setLoading(true);
         try {
@@ -143,7 +159,7 @@ class MethodStore {
         } finally {
             this.setLoading(false);
         }
-    }
+    }    
 
     fetchUserMethodologicals = async () => {
         this.setLoading(true);

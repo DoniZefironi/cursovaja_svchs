@@ -6,7 +6,6 @@ import './userlist.css';
 import { Context } from '../../index';
 import Search from '../../components/searcuser';
 import Report from '../../components/report';
-import ViewByAuthor from '../../components/viewbyauthor'; 
 import UserList from '../../components/userlist';
 import UserModal from '../../components/usermodal';
 import UserModalCreate from '../../components/usermodalcreate';
@@ -46,6 +45,7 @@ const UserContainer = observer(() => {
     );
     setShowCreateModal(false);
     setNewUser({ name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '', password: '' });
+    window.location.reload();  
 };
 
 
@@ -115,10 +115,6 @@ const handleEdit = () => {
           <Col md={4}>
             <div className="content-box filter-box">
               <Search />
-              <div className="filter-section">
-                <h5>Просмотр</h5>
-                <ViewByAuthor />
-              </div>
               <Report />
             </div>
           </Col>

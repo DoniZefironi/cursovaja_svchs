@@ -11,6 +11,7 @@ import UserMethodologicalModal from '../../components/userMethodologicalModal';
 import SelectUserModal from '../../components/selectUserModal';
 import SelectSpecialityModal from '../../components/selectSpecialityModal';
 import SpecialityMethodologicalModal from '../../components/specialityMethodologicalModal';
+import YearFilter from '../../components/yearfilter'
 import { toJS } from 'mobx';
 const MethodContainer = observer(() => {
   const { method, user: currentUser, author, specialityMethod } = useContext(Context);
@@ -30,8 +31,8 @@ const MethodContainer = observer(() => {
   const [showSelectUserModal, setShowSelectUserModal] = useState(false);
   const [showSelectSpecialityModal, setShowSelectSpecialityModal] = useState(false);
   const [showSpecialityMethodModal, setShowSpecialityMethodModal] = useState(false);
-  const [currentMethod, setCurrentMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
-  const [newMethod, setNewMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
+  const [currentMethod, setCurrentMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', file: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
+  const [newMethod, setNewMethod] = useState({ title: '', description: '', language: '', year_create: '', date_realese: '', file: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
   const [search, setSearch] = useState('');
   const [file, setFile] = useState(null);
   const [userMethodologicals, setUserMethodologicals] = useState([]);
@@ -43,7 +44,7 @@ const MethodContainer = observer(() => {
       fetchSubjects();
       fetchTypeMethods();
       fetchUsers();
-      fetchSpecialities(); // Убедимся, что метод вызывается
+      fetchSpecialities(); 
   }, [fetchMethods, fetchSubjects, fetchTypeMethods, fetchUsers, fetchSpecialities, currentPage]);
   
   console.log('Specialities before conversion:', specialities);
@@ -63,8 +64,9 @@ const MethodContainer = observer(() => {
     }
     createMethod(formData);
     setShowCreateModal(false);
-    setNewMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
+    setNewMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', file: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
     setFile(null);
+    window.location.reload();  
   };
 
   const handleEdit = () => {
@@ -77,12 +79,14 @@ const MethodContainer = observer(() => {
     }
     updateMethod(currentMethod.id, formData);
     setShowEditModal(false);
-    setCurrentMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', url: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
+    setCurrentMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', file: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
     setFile(null);
+    window.location.reload();  
   };
 
   const handleDelete = (id) => {
     deleteMethod(id);
+    window.location.reload();  
   };
 
   const handleChange = (e, key, isNew = false) => {
@@ -113,6 +117,7 @@ const MethodContainer = observer(() => {
   const handleCreateUserMethodological = (methodId) => {
     setSelectedMethodId(methodId);
     setShowSelectUserModal(true);
+    window.location.reload();  
   };
 
   const handleSelectUser = (userId) => {
@@ -133,11 +138,12 @@ const MethodContainer = observer(() => {
   const handleCreateSpecialityMethodological = (methodId) => {
     setSelectedMethodId(methodId);
     setShowSelectSpecialityModal(true);
+    window.location.reload();  
   };
 
   const handleSelectSpeciality = (specialityId) => {
     const formData = { specialityId: parseInt(specialityId, 10), methodologicalRecId: parseInt(selectedMethodId, 10) };
-    console.log('Sending data to server:', formData); // Логирование данных перед отправкой
+    console.log('Sending data to server:', formData); 
     createSpecialityMethodological(formData);
     setShowSelectSpecialityModal(false);
     setSelectedMethodId(null);
@@ -211,18 +217,12 @@ const MethodContainer = observer(() => {
                 <Form.Select className="mb-3">
                   <option>Автору</option>
                 </Form.Select>
-                <Form.Select>
-                  <option>Дате публикации</option>
-                </Form.Select>
+                <YearFilter />
               </div>
               <div className="report-section mt-3">
                 <h5>Отчет</h5>
                 <Button variant="light" className="download-button">Скачать</Button>
                 </div>
-                <div className="report-section mt-3">
-                <h5>Отчет</h5>
-                <Button variant="light" className="download-button">Скачать</Button>
-              </div>
             </div>
           </Col>
         </Row>

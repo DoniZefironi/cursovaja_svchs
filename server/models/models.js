@@ -70,7 +70,6 @@ const Speciality_method = sequelize.define('speciality_method', {
     methodologicalRecId: { type: DataTypes.INTEGER, references: { model: 'methodological_recs', key: 'id' }, allowNull: false }
 });
 
-// Ассоциации
 Syllabus.hasMany(Subject);
 Subject.belongsTo(Syllabus);
 

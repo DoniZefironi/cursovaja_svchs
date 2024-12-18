@@ -30,24 +30,31 @@ class SyllabusController {
 
     async getAll(req, res, next) {
         try {
-            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
+            const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {}, year } = req.query;
             const offset = (page - 1) * limit;
             const where = {};
-
+    
             if (search) {
                 where[Op.or] = [
                     { date: { [Op.like]: `%${search}%` } },
                     { name: { [Op.like]: `%${search}%` } }
                 ];
             }
-
+    
+            if (year) {
+                where.date = {
+                    [Op.gte]: new Date(`${year}-01-01`),
+                    [Op.lte]: new Date(`${year}-12-31`)
+                };
+            }
+    
             const syllabuses = await Syllabus.findAndCountAll({
                 where,
                 limit,
                 offset,
                 order: [[sortBy, order]]
             });
-
+    
             return res.json({
                 total: syllabuses.count,
                 pages: Math.ceil(syllabuses.count / limit),
@@ -58,6 +65,7 @@ class SyllabusController {
             return next(ApiError.internal('Failed to retrieve syllabuses'));
         }
     }
+    
 
     async updateOne(req, res, next) {
         try {

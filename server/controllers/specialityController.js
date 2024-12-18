@@ -15,7 +15,7 @@ class SpecialityController {
         async getAll(req, res) {
             try {
                 const specialities = await Speciality.findAll();
-                console.log('Fetched Specialities from DB:', specialities); // Логирование данных
+                console.log('Fetched Specialities from DB:', specialities); 
                 return res.json(specialities);
             } catch (error) {
                 console.log('Error fetching specialities:', error);

@@ -3,13 +3,13 @@ import { Form } from 'react-bootstrap';
 import { observer } from 'mobx-react-lite';
 import { Context } from '../index';
 
-const ViewByDate = observer(() => {
-  const { syllabus } = useContext(Context);
+const YearFilter = observer(() => {
+  const { method } = useContext(Context);
 
   const handleYearChange = (e) => {
     const selectedYear = e.target.value;
     if (selectedYear) {
-      syllabus.fetchSyllabusesByYear(selectedYear);
+      method.fetchMethodsByYear(selectedYear);
     }
   };
 
@@ -26,4 +26,4 @@ const ViewByDate = observer(() => {
   );
 });
 
-export default ViewByDate;
+export default YearFilter;
