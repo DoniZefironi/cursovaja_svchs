@@ -3,7 +3,6 @@ import { Button, Collapse } from 'react-bootstrap';
 import { FaFileDownload, FaEdit, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
 
 const SyllabusList = ({ syllabuses, handleEdit, handleDelete, handleToggle, openIndex, setCurrentSyllabus, setShowModal, setEditMode, handleDownload, currentUser }) => {
-  // Проверяем наличие currentUser и его свойств
   const isAdmin = currentUser?.user?.roles?.includes("ADMIN") || false;
 
   return (

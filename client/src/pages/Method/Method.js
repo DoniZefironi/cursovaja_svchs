@@ -11,8 +11,10 @@ import UserMethodologicalModal from '../../components/userMethodologicalModal';
 import SelectUserModal from '../../components/selectUserModal';
 import SelectSpecialityModal from '../../components/selectSpecialityModal';
 import SpecialityMethodologicalModal from '../../components/specialityMethodologicalModal';
-import YearFilter from '../../components/yearfilter'
+import YearFilter from '../../components/yearfilter';
+import Report from '../../components/report';
 import { toJS } from 'mobx';
+
 const MethodContainer = observer(() => {
   const { method, user: currentUser, author, specialityMethod } = useContext(Context);
 
@@ -23,7 +25,6 @@ const MethodContainer = observer(() => {
   const { methods, fetchMethods, createMethod, updateMethod, deleteMethod, searchMethods, setSearchQuery, currentPage, totalPages, subjects, typeMethods, fetchSubjects, fetchTypeMethods, downloadMethod, createUserMethodological, fetchUserMethodologicals } = method;
   const { users, fetchUsers } = author;
   const { specialities, fetchSpecialities, createSpecialityMethodological, fetchSpecialityMethodologicals } = specialityMethod;
-
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -46,10 +47,9 @@ const MethodContainer = observer(() => {
       fetchUsers();
       fetchSpecialities(); 
   }, [fetchMethods, fetchSubjects, fetchTypeMethods, fetchUsers, fetchSpecialities, currentPage]);
-  
-  console.log('Specialities before conversion:', specialities);
+
   const specialitiesArray = toJS(specialities);
-  console.log('Specialities after conversion:', specialitiesArray);
+
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
@@ -122,7 +122,6 @@ const MethodContainer = observer(() => {
 
   const handleSelectUser = (userId) => {
     const formData = { userId: parseInt(userId, 10), methodologicalId: parseInt(selectedMethodId, 10) };
-    console.log('Sending data to server:', formData);
     createUserMethodological(formData);
     setShowSelectUserModal(false);
     setSelectedMethodId(null);
@@ -143,7 +142,6 @@ const MethodContainer = observer(() => {
 
   const handleSelectSpeciality = (specialityId) => {
     const formData = { specialityId: parseInt(specialityId, 10), methodologicalRecId: parseInt(selectedMethodId, 10) };
-    console.log('Sending data to server:', formData); 
     createSpecialityMethodological(formData);
     setShowSelectSpecialityModal(false);
     setSelectedMethodId(null);
@@ -155,7 +153,7 @@ const MethodContainer = observer(() => {
     setSpecialityMethodologicals(filteredSpecialityMethodologicals);
     setShowSpecialityMethodModal(true);
   };
-
+  const userId = currentUser.user.id;
   return (
     <div className='main'>
       <Container className="mt-4">
@@ -219,10 +217,7 @@ const MethodContainer = observer(() => {
                 </Form.Select>
                 <YearFilter />
               </div>
-              <div className="report-section mt-3">
-                <h5>Отчет</h5>
-                <Button variant="light" className="download-button">Скачать</Button>
-                </div>
+              <Report userId={userId} />
             </div>
           </Col>
         </Row>
@@ -268,7 +263,7 @@ const MethodContainer = observer(() => {
 <SelectSpecialityModal
       show={showSelectSpecialityModal}
       onHide={() => setShowSelectSpecialityModal(false)}
-      specialities={specialitiesArray} // Преобразование данных из Proxy
+      specialities={specialitiesArray} 
       onSelectSpeciality={handleSelectSpeciality}
   />
   

@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Button, ListGroup } from 'react-bootstrap';
 
 const SelectSpecialityModal = ({ show, onHide, specialities, onSelectSpeciality }) => {
-  console.log('Rendering Specialities:', specialities); // Логирование данных специальностей
+  console.log('Rendering Specialities:', specialities); 
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
