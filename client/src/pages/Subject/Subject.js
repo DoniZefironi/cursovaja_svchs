@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './subject.css';
 import { Context } from '../../index';
 import Search from '../../components/search';
-import { FaPlus, FaMinus } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaEdit } from 'react-icons/fa';
 
 const SubjectContainer = observer(() => {
   const { subject, user } = useContext(Context);
@@ -57,9 +57,6 @@ const SubjectContainer = observer(() => {
   return (
     <div className='main'>
       <Container className="mt-4">
-        {user.user.roles.includes("ADMIN") && ( 
-          <Button variant="primary" onClick={() => setShowCreateModal(true)}>Создать</Button>
-        )}
         <Row className='gapchek'>
           <Col md={8}>
             <div className="content-box list-box width100">
@@ -71,6 +68,7 @@ const SubjectContainer = observer(() => {
                         <div>
                           <h6>{item.name}</h6>
                         </div>
+                        <div className='iconochke'>
                         <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
                           {openIndex === index ? <FaMinus /> : <FaPlus />}
                         </Button>
@@ -82,9 +80,10 @@ const SubjectContainer = observer(() => {
                               setShowEditModal(true);
                             }}
                           >
-                            Изменить
+                            <FaEdit />
                           </Button>
                         )}
+                        </div>
                       </div>
                       <Collapse in={openIndex === index}>
                         <div className="additional-info">
@@ -100,23 +99,31 @@ const SubjectContainer = observer(() => {
             </div>
             <div className="pagination-controls mt-3">
               <Button
+              style={{backgroundColor : "#2B579A"}}
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                Previous
+                пред.
               </Button>
               <span>{`Page ${currentPage} of ${totalPages}`}</span>
               <Button
+              style={{backgroundColor : "#2B579A"}}
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Next
+                след.
               </Button>
             </div>
           </Col>
           <Col md={4}>
             <div className="content-box filter-box">
               <Search />
+              {user.user.roles.includes("ADMIN") && ( 
+                <>
+                <h5>Создать дисциплину</h5>
+                          <Button variant="light" onClick={() => setShowCreateModal(true)}>Создать</Button>
+                </>
+        )}
             </div>
           </Col>
         </Row>

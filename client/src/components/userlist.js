@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Collapse } from 'react-bootstrap';
-import { FaPlus, FaMinus } from 'react-icons/fa';
+import { FaPlus, FaMinus, FaEdit } from 'react-icons/fa';
 
 const UserList = ({ users, currentUser, handleToggle, openIndex, setCurrentUserEdit, setShowEditModal }) => {
   return (
@@ -13,6 +13,7 @@ const UserList = ({ users, currentUser, handleToggle, openIndex, setCurrentUserE
                 <h6>{`${user.surname} ${user.name} ${user.patronymic}`}</h6>
                 <p>Должность: {user.position}</p>
               </div>
+              <div className='iconochke'>
               <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
                 {openIndex === index ? <FaMinus /> : <FaPlus />}
               </Button>
@@ -24,9 +25,10 @@ const UserList = ({ users, currentUser, handleToggle, openIndex, setCurrentUserE
                     setShowEditModal(true);
                   }}
                 >
-                  Изменить
+                  <FaEdit />
                 </Button>
               )}
+              </div>
             </div>
             <Collapse in={openIndex === index}>
               <div className="additional-info">

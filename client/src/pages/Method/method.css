@@ -1,7 +1,11 @@
 body {
     background-color: #E2F2FE;
+    
   }
-  
+  .iconochke{
+    display: flex;
+    gap: 20px;
+  }
   .navbar {
     margin-bottom: 20px;
   }

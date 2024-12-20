@@ -83,9 +83,6 @@ const handleEdit = () => {
   return (
     <div className='main'>
       <Container className="mt-4">
-        {currentUser.user.roles.includes("ADMIN") && ( 
-          <Button variant="primary" onClick={() => setShowCreateModal(true)}>Создать</Button>
-        )}
         <Row className='gapchek'>
           <Col md={8}>
             <UserList
@@ -96,19 +93,21 @@ const handleEdit = () => {
               setCurrentUserEdit={setCurrentUserEdit}
               setShowEditModal={setShowEditModal}
             />
-            <div className="pagination-controls">
+            <div className="pagination-controls mt-3">
               <Button
+              style={{backgroundColor : "#2B579A"}}
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                Previous
+                пред.
               </Button>
               <span>{`Page ${currentPage} of ${totalPages}`}</span>
               <Button
+              style={{backgroundColor : "#2B579A"}}
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Next
+                след.
               </Button>
             </div>
           </Col>
@@ -116,6 +115,12 @@ const handleEdit = () => {
             <div className="content-box filter-box">
               <Search />
               <Report />
+              {currentUser.user.roles.includes("ADMIN") && ( 
+                <>
+                <h5>Создать преподавателя</h5>
+                          <Button variant="light" onClick={() => setShowCreateModal(true)}>Создать</Button>
+                </>
+        )}
             </div>
           </Col>
         </Row>

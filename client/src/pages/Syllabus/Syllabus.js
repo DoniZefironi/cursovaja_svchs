@@ -75,9 +75,6 @@ const SyllabusContainer = observer(() => {
   return (
     <div className='main'>
       <Container className="mt-4">
-        {currentUser.user.roles.includes("ADMIN") && (
-          <Button variant="primary" onClick={() => { setEditMode(false); setShowModal(true); }}>Создать</Button>
-        )}
         <Row className='gapchek'>
           <Col md={8}>
             <SyllabusList
@@ -91,19 +88,21 @@ const SyllabusContainer = observer(() => {
               handleDelete={deleteSyllabus}
               handleDownload={downloadSyllabus}
             />
-            <div className="pagination-controls">
+            <div className="pagination-controls mt-3">
               <Button
+              style={{backgroundColor : "#2B579A"}}
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                Previous
+                пред.
               </Button>
               <span>{`Page ${currentPage} of ${totalPages}`}</span>
               <Button
+              style={{backgroundColor : "#2B579A"}}
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Next
+                след.
               </Button>
             </div>
           </Col>
@@ -114,6 +113,12 @@ const SyllabusContainer = observer(() => {
                 <h5>Просмотр</h5>
                 <ViewByDate />
               </div>
+              {currentUser.user.roles.includes("ADMIN") && (
+                <>
+                <h5>Создать учебный план</h5>
+                          <Button variant="light" onClick={() => { setEditMode(false); setShowModal(true); }}>Создать</Button>
+                </>
+        )}
             </div>
           </Col>
         </Row>

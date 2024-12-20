@@ -15,6 +15,7 @@ const SyllabusList = ({ syllabuses, handleEdit, handleDelete, handleToggle, open
                 <h6>{syllabus.name}</h6>
                 <p>{new Date(syllabus.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
               </div>
+              <div className='iconochke'>
               <div>
                 <Button variant="link" onClick={() => handleDownload(syllabus.syllfile)}>
                   <FaFileDownload />
@@ -44,6 +45,7 @@ const SyllabusList = ({ syllabuses, handleEdit, handleDelete, handleToggle, open
               <Button variant="light" className="plus-button" onClick={() => handleToggle(index)}>
                 {openIndex === index ? <FaMinus /> : <FaPlus />}
               </Button>
+              </div>
             </div>
             <Collapse in={openIndex === index}>
               <div className="additional-info">

@@ -13,7 +13,7 @@ const Report = ({ userId }) => {
       console.error("User ID is undefined");
       return;
     }
-    console.log("Fetching report for User ID:", userId); // Логируем userId
+    console.log("Fetching report for User ID:", userId); 
 
     const fetchUserReport = async () => {
       try {

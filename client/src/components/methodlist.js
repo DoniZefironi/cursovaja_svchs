@@ -12,6 +12,7 @@ const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete
               <h6>{method.title}</h6>
               <p>{method.author} ({method.university}, {method.year_create})</p>
             </div>
+            <div className='iconochke'>
             <div>
               <Button variant="link" onClick={() => handleDownload(method.url)}>
                 <FaFileDownload />
@@ -43,6 +44,7 @@ const MethodList = ({ methods, handleToggle, openIndex, handleEdit, handleDelete
               </>
             )}
           </div>
+            </div>
           <Collapse in={openIndex === index}>
             <div className="additional-info">
               <p>{method.description}</p>
