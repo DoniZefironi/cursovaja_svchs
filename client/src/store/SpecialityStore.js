@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 
 class SpecialityStore {
     specialities = [];
+    methodologicals = []; // Добавьте это свойство
     loading = false;
     error = null;
 
@@ -12,6 +13,10 @@ class SpecialityStore {
 
     setSpecialities = (specialities) => {
         this.specialities = specialities;
+    }
+
+    setMethodologicals = (methodologicals) => { // Добавьте метод для установки методических рекомендаций
+        this.methodologicals = methodologicals;
     }
 
     setLoading = (loading) => {
@@ -35,7 +40,20 @@ class SpecialityStore {
             this.setLoading(false);
         }
     }
-        
+
+    fetchMethodologicals = async () => { // Добавьте метод для загрузки методических рекомендаций
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/method/all', { withCredentials: true });
+            console.log('Fetched Methodologicals from API:', response.data);
+            this.setMethodologicals(Array.isArray(response.data) ? response.data : []);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to fetch methodologicals');
+            console.log('Error fetching methodologicals:', error); 
+        } finally {
+            this.setLoading(false);
+        }
+    }
 
     createSpecialityMethodological = async (formData) => {
         this.setLoading(true);

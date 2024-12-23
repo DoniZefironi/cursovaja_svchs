@@ -2,6 +2,8 @@ import React from 'react';
 import { Modal, Button, ListGroup } from 'react-bootstrap';
 
 const SpecialityMethodologicalModal = ({ show, onHide, specialityMethodologicals = [] }) => {
+  console.log('SpecialityMethodologicals:', specialityMethodologicals); // Логируем данные
+
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
@@ -10,9 +12,17 @@ const SpecialityMethodologicalModal = ({ show, onHide, specialityMethodologicals
       <Modal.Body>
         {Array.isArray(specialityMethodologicals) && specialityMethodologicals.length > 0 ? (
           <ListGroup>
-            {specialityMethodologicals.map((sm) => (
-              <ListGroup.Item key={sm.id}>{sm.Speciality ? sm.Speciality.name : 'Без имени'} - {sm.Methodological_rec ? sm.Methodological_rec.title : 'Без названия'}</ListGroup.Item>
-            ))}
+            {specialityMethodologicals.map((sm) => {
+              console.log('Speciality:', sm.Speciality); // Логируем специальность
+              console.log('Methodological_rec:', sm.Methodological_rec); // Логируем методичку
+              return (
+<ListGroup.Item key={sm.id}>
+  {sm?.Speciality?.name || 'Специальность отсутствует'} - 
+  {sm?.Methodological_rec?.title || 'Методичка отсутствует'}
+</ListGroup.Item>
+
+              );
+            })}
           </ListGroup>
         ) : (
           <p>Нет специальностей, прикрепленных к этой методичке</p>

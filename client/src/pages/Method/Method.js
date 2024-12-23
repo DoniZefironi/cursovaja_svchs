@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Container, Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
+import { Container, Row, Button, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './method.css';
-import { FaSearch } from 'react-icons/fa';
 import { observer } from 'mobx-react-lite';
 import { Context } from '../../index';
 import MethodList from '../../components/methodlist';
@@ -11,8 +10,7 @@ import UserMethodologicalModal from '../../components/userMethodologicalModal';
 import SelectUserModal from '../../components/selectUserModal';
 import SelectSpecialityModal from '../../components/selectSpecialityModal';
 import SpecialityMethodologicalModal from '../../components/specialityMethodologicalModal';
-import YearFilter from '../../components/yearfilter';
-import Report from '../../components/report';
+import FilterBox from '../../components/filterbox';
 import { toJS } from 'mobx';
 
 const MethodContainer = observer(() => {
@@ -41,12 +39,13 @@ const MethodContainer = observer(() => {
   const [selectedMethodId, setSelectedMethodId] = useState(null);
 
   useEffect(() => {
-      fetchMethods(currentPage);
-      fetchSubjects();
-      fetchTypeMethods();
-      fetchUsers();
-      fetchSpecialities(); 
-  }, [fetchMethods, fetchSubjects, fetchTypeMethods, fetchUsers, fetchSpecialities, currentPage]);
+    fetchMethods(currentPage);
+    fetchSubjects();
+    fetchTypeMethods();
+    fetchUsers();
+    fetchSpecialities();
+    console.log('Specialities:', toJS(specialities));
+}, [fetchMethods, fetchSubjects, fetchTypeMethods, fetchUsers, fetchSpecialities, currentPage]);
 
   const specialitiesArray = toJS(specialities);
 
@@ -145,18 +144,34 @@ const MethodContainer = observer(() => {
     setSelectedMethodId(null);
 };
 
-  const handleViewSpecialityMethodological = async (methodId) => {
-    const specialityMethodologicals = await fetchSpecialityMethodologicals();
-    const filteredSpecialityMethodologicals = specialityMethodologicals.filter((sm) => sm.methodologicalRecId === methodId);
-    setSpecialityMethodologicals(filteredSpecialityMethodologicals);
-    setShowSpecialityMethodModal(true);
-  };
+const handleViewSpecialityMethodological = async (methodId) => {
+  const specialityMethodologicals = await fetchSpecialityMethodologicals();
+  const filteredSpecialityMethodologicals = specialityMethodologicals.filter((sm) => sm.methodologicalRecId === methodId);
+
+  // Если нужно дополнительно загрузить связанные данные
+  const enhancedData = await Promise.all(
+    filteredSpecialityMethodologicals.map(async (sm) => {
+      const speciality = specialities.find(s => s.id === sm.specialityId) || {};
+      const methodologicalRec = methods.find(m => m.id === sm.methodologicalRecId) || {};
+      return {
+        ...sm,
+        Speciality: speciality,
+        Methodological_rec: methodologicalRec,
+      };
+    })
+  );
+
+  setSpecialityMethodologicals(enhancedData);
+  setShowSpecialityMethodModal(true);
+};
+
+
   const userId = currentUser.user.id;
   return (
     <div className='main'>
       <Container className="mt-4">
         <Row className='gapchek'>
-          <Col md={8}>
+          <Col md={8} className=''>
             <MethodList
               methods={methods}
               handleToggle={handleToggle}
@@ -191,38 +206,14 @@ const MethodContainer = observer(() => {
               </Button>
             </div>
           </Col>
-          <Col md={4}>
-            <div className="content-box filter-box">
-              <Form onSubmit={handleSearchSubmit}>
-                <InputGroup className="mb-3">
-                  <Form.Control
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Поиск"
-                    aria-label="Поиск"
-                    aria-describedby="basic-addon2"
-                  />
-                  <Button variant="light" type="submit" id="button-addon2">
-                    <FaSearch />
-                  </Button>
-                </InputGroup>
-              </Form>
-              <div className="filter-section">
-                <h5>Просмотр</h5>
-                <Form.Select className="mb-3">
-                  <option>Автору</option>
-                </Form.Select>
-                <YearFilter />
-              </div>
-              <Report userId={userId} />
-              {currentUser.user.roles.includes("ADMIN") && (
-                 <>
-                 <h5>Создать методическую рекомендацию</h5>
-                 <Button variant="light" onClick={() => setShowCreateModal(true)}>Создать</Button>
-                 </>
-      )}
-            </div>
-          </Col>
+          <FilterBox
+            search={search}
+            setSearch={setSearch}
+            handleSearchSubmit={handleSearchSubmit}
+            userId={userId}
+            currentUser={currentUser}
+            setShowCreateModal={setShowCreateModal}
+          />
         </Row>
       </Container>
 
