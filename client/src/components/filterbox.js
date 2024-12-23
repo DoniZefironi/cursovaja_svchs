@@ -24,9 +24,6 @@ const FilterBox = ({ search, setSearch, handleSearchSubmit, userId, currentUser,
         </Form>
         <div className="filter-section">
           <h5>Просмотр</h5>
-          <Form.Select className="mb-3">
-            <option>Автору</option>
-          </Form.Select>
           <YearFilter />
         </div>
         <Report userId={userId} />

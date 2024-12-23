@@ -65,7 +65,7 @@ const MethodContainer = observer(() => {
     setShowCreateModal(false);
     setNewMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', file: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
     setFile(null);
-    window.location.reload();  
+    // window.location.reload();  
   };
 
   const handleEdit = () => {
@@ -144,11 +144,10 @@ const MethodContainer = observer(() => {
     setSelectedMethodId(null);
 };
 
-const handleViewSpecialityMethodological = async (methodId) => {
+const handleViewSpecialityMethodological = async (methodId, specialityId) => {
   const specialityMethodologicals = await fetchSpecialityMethodologicals();
   const filteredSpecialityMethodologicals = specialityMethodologicals.filter((sm) => sm.methodologicalRecId === methodId);
 
-  // Если нужно дополнительно загрузить связанные данные
   const enhancedData = await Promise.all(
     filteredSpecialityMethodologicals.map(async (sm) => {
       const speciality = specialities.find(s => s.id === sm.specialityId) || {};
