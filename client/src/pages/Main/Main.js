@@ -14,7 +14,7 @@ const Main = () => {
           <Col md={8} className="mb-4 wap">
             <div className="content-box">
               <h3>Методические рекомендации</h3>
-              <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+              <p>В разделе представлены методические рекомендации по разработке учебных материалов, планированию учебного процесса и оценке знаний студентов.</p>
               <Button variant="light" className="custom-button">Рекомендации</Button>
             </div>
           </Col>
@@ -33,7 +33,7 @@ const Main = () => {
               <Col md={8} className="mb-4 wap">
                 <div className="content-box">
                   <h3>Дисциплины</h3>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                  <p>Этот раздел содержит информацию по различным учебным дисциплинам, их структуре, содержанию и учебным целям для преподавателей.</p>
                   <Button variant="light" className="custom-button">Дисциплины</Button>
                 </div>
               </Col>
@@ -42,13 +42,13 @@ const Main = () => {
             <Col md={8} className="mb-4 wap">
                 <div className="content-box">
                   <h3>Учебные планы</h3>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                  <p>В этом разделе вы найдете учебные планы, включающие расписание занятий, планирование курсов и распределение учебного времени.</p>
                   <Button variant="light" className="custom-button">Учебные планы</Button>
                 </div>
               </Col>
               <Col md={4} className="mb-4 wap wapnone">
                 <div className="content-box-img">
-                  <img src={syb} alt="Report" className="img-fluid" />
+                  <img src={syb} alt="Syllabus" className="img-fluid" />
                 </div>
               </Col>
             </Row>

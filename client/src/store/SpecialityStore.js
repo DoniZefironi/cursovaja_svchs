@@ -3,7 +3,7 @@ import { makeAutoObservable } from 'mobx';
 
 class SpecialityStore {
     specialities = [];
-    methodologicals = []; // Добавьте это свойство
+    methodologicals = [];
     loading = false;
     error = null;
 
@@ -15,7 +15,7 @@ class SpecialityStore {
         this.specialities = specialities;
     }
 
-    setMethodologicals = (methodologicals) => { // Добавьте метод для установки методических рекомендаций
+    setMethodologicals = (methodologicals) => {
         this.methodologicals = methodologicals;
     }
 
@@ -31,17 +31,17 @@ class SpecialityStore {
         this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/speciality/all', { withCredentials: true });
-            console.log('Fetched Specialities from API:', response.data); 
+            console.log('Fetched Specialities from API:', response.data);
             this.setSpecialities(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch specialities');
-            console.log('Error fetching specialities:', error); 
+            console.log('Error fetching specialities:', error);
         } finally {
             this.setLoading(false);
         }
     }
 
-    fetchMethodologicals = async () => { // Добавьте метод для загрузки методических рекомендаций
+    fetchMethodologicals = async () => {
         this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/method/all', { withCredentials: true });
@@ -49,7 +49,7 @@ class SpecialityStore {
             this.setMethodologicals(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch methodologicals');
-            console.log('Error fetching methodologicals:', error); 
+            console.log('Error fetching methodologicals:', error);
         } finally {
             this.setLoading(false);
         }
@@ -63,14 +63,14 @@ class SpecialityStore {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log('SpecialityMethodological created:', response.data); 
+            console.log('SpecialityMethodological created:', response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create speciality methodological');
-            console.log('Error creating speciality methodological:', error); 
+            console.log('Error creating speciality methodological:', error);
         } finally {
             this.setLoading(false);
         }
-    }    
+    }
 
     fetchSpecialityMethodologicals = async () => {
         this.setLoading(true);

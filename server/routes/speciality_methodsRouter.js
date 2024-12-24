@@ -1,12 +1,13 @@
-const express = require('express');
-const router = express.Router();
-const speciality_methodsController = require('../controllers/speciality_methodsController');
+const Router = require('express');
+const router = new Router();
+const specialityMethodsController = require('../controllers/speciality_methodsController');
 
-router.post('/create', speciality_methodsController.create);
-router.get('/all', speciality_methodsController.getAll);
-router.get('/one', speciality_methodsController.getOne);
-router.put('/:id', speciality_methodsController.updateOne);
-router.delete('/:id', speciality_methodsController.deleteOne);
-router.get('/search', speciality_methodsController.search);
+// Обратите внимание, что здесь используется /all для получения всех методичек
+router.post('/create', specialityMethodsController.create);
+router.get('/all', specialityMethodsController.getAll);
+router.get('/:id', specialityMethodsController.getOne); // Путь для получения методички по ID
+router.put('/:id', specialityMethodsController.updateOne);
+router.delete('/:id', specialityMethodsController.deleteOne);
+router.get('/search', specialityMethodsController.search);
 
 module.exports = router;

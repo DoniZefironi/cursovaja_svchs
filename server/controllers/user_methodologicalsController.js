@@ -1,5 +1,6 @@
 const { User_methodological, User, Methodological_rec } = require('../models/models');
 const ApiError = require('../error/ApiError');
+const { Op } = require('sequelize');
 
 class UserMethodologicalsController {
     async create(req, res, next) {
@@ -25,6 +26,7 @@ class UserMethodologicalsController {
                     { model: Methodological_rec, attributes: ['id', 'title'] }
                 ]
             });
+            console.log('Fetched User Methodologicals:', userMethodologicals); // Логирование для проверки
             return res.json(userMethodologicals);
         } catch (error) {
             next(ApiError.internal(error.message));

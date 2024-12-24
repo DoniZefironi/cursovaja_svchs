@@ -17,32 +17,35 @@ const Footer = () => {
             <Col md={4}>
               <h5>Полезные ссылки</h5>
               <ul className="list-unstyled">
-              <li><a href="#link1" className="text-white"><img src={unic} alt="Report" className="img-fluid" /></a></li>
-                <li><a href="#link2" className="text-white"><img src={caf} alt="Report" className="img-fluid" /></a></li>
-                <li><a href="#link3" className="text-white"><img src={bib} alt="Report" className="img-fluid" /></a></li>
+              <li><a href="http://bru.by/" className="text-white"><img src={unic} alt="Report" className="img-fluid" /></a></li>
+                <li><a href="http://bru.by/content/departments/softinformtechnology" className="text-white"><img src={caf} alt="Report" className="img-fluid" /></a></li>
+                <li><a href="http://biblio.bru.by/" className="text-white"><img src={bib} alt="Report" className="img-fluid" /></a></li>
               </ul>
             </Col>
             <Col md={4}>
-              <h5>Быстрые ссылки</h5>
-              <ul className="list-unstyled">
-                <li><a href="#link3" className="text-white">Отчет</a></li>
-              </ul>
-            </Col>
-            <Col md={4}>
-              <h5>Контакты</h5>
-              <div className="blockimg">
-              <img src={geo} alt="Report" className="img-fluid" />
-              <a>г. Могилев, ул. Ленинская 89, ауд. 322, корпус №2</a>
-              </div>
-              <div className="blockimg">
-              <img src={tel} alt="Report" className="img-fluid" />
-              <a> +375-22-629-447</a>
-              </div>
-              <div className="blockimg">
-              <img src={sms} alt="Report" className="img-fluid" />
-              <a>poit@bru.by</a>
-              </div>
-            </Col>
+            <h5>Контакты</h5>
+            <div className="blockimg">
+              <a href="https://maps.google.com?q=г.+Могилев,+ул.+Ленинская+89,+ауд.+322,+корпус+№2" target="_blank" rel="noopener noreferrer">
+                <img src={geo} alt="Report" className="img-fluid" />
+              </a>
+              <a href="https://maps.google.com?q=г.+Могилев,+ул.+Ленинская+89,+ауд.+322,+корпус+№2" target="_blank" rel="noopener noreferrer">
+                г. Могилев, ул. Ленинская 89, ауд. 322, корпус №2
+              </a>
+            </div>
+            <div className="blockimg">
+              <a href="tel:+37522629447">
+                <img src={tel} alt="Report" className="img-fluid" />
+              </a>
+              <a href="tel:+37522629447">+375-22-629-447</a>
+            </div>
+            <div className="blockimg">
+              <a href="mailto:poit@bru.by">
+                <img src={sms} alt="Report" className="img-fluid" />
+              </a>
+              <a href="mailto:poit@bru.by">poit@bru.by</a>
+            </div>
+          </Col>
+
           </Row>
         </Container>
       </footer>

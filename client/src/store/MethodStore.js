@@ -58,21 +58,21 @@ class MethodStore {
         this.error = error;
     }
 
-fetchMethodsByYear = async (year, page = 1) => {
-    this.setLoading(true);
-    try {
-        const response = await axios.get('http://localhost:5000/api/method/all', {
-            params: { year, page, limit: 10 }
-        });
-        this.setMethods(response.data.data);
-        this.setTotalPages(response.data.pages);
-        this.setPage(page);
-    } catch (error) {
-        this.setError(error.response?.data || 'Failed to fetch methods');
-    } finally {
-        this.setLoading(false);
+    fetchMethodsByYear = async (year, page = 1) => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get('http://localhost:5000/api/method/all', {
+                params: { year, page, limit: 10 }
+            });
+            this.setMethods(response.data.data);
+            this.setTotalPages(response.data.pages);
+            this.setPage(page);
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to fetch methods');
+        } finally {
+            this.setLoading(false);
+        }
     }
-}
 
     fetchMethods = async (page = 1) => {
         this.setLoading(true);
@@ -85,6 +85,18 @@ fetchMethodsByYear = async (year, page = 1) => {
             this.setPage(page);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch methods');
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    fetchMethodologicalById = async (id) => {
+        this.setLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:5000/api/method/one/${id}`);
+            return response.data;
+        } catch (error) {
+            this.setError(error.response?.data || 'Failed to fetch method by ID');
         } finally {
             this.setLoading(false);
         }
@@ -165,7 +177,6 @@ fetchMethodsByYear = async (year, page = 1) => {
         this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/user_methodological/all', { withCredentials: true });
-            console.log('Fetched UserMethodologicals:', response.data);
             return response.data;
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch user methodologicals');
@@ -210,7 +221,6 @@ fetchMethodsByYear = async (year, page = 1) => {
         this.setLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/api/speciality_method/all', { withCredentials: true });
-            console.log('Fetched SpecialityMethodologicals:', response.data);
             return response.data;
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch speciality methodologicals');

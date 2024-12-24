@@ -1,5 +1,6 @@
-const { Speciality_method } = require('../models/models');
+const { Speciality_method, Speciality, Methodological_rec } = require('../models/models');
 const ApiError = require('../error/ApiError');
+const { Op } = require('sequelize');
 
 class SpecialityMethodsController {
     async create(req, res, next) {
@@ -14,9 +15,17 @@ class SpecialityMethodsController {
 
     async getAll(req, res, next) {
         try {
-            const specialityMethods = await Speciality_method.findAll();
+            console.log('Fetching all speciality methods...');
+            const specialityMethods = await Speciality_method.findAll({
+                include: [
+                    { model: Speciality, attributes: ['id', 'code'] },
+                    { model: Methodological_rec, attributes: ['id', 'title', 'description'] }
+                ]
+            });
+            console.log('Fetched Speciality Methodologicals:', specialityMethods);
             return res.json(specialityMethods);
         } catch (error) {
+            console.error('Error fetching speciality methods:', error);
             next(ApiError.internal(error.message));
         }
     }
@@ -24,7 +33,13 @@ class SpecialityMethodsController {
     async getOne(req, res, next) {
         try {
             const { id } = req.query;
-            const specialityMethod = await Speciality_method.findOne({ where: { id } });
+            const specialityMethod = await Speciality_method.findOne({
+                where: { id },
+                include: [
+                    { model: Speciality, attributes: ['id', 'code'] },
+                    { model: Methodological_rec, attributes: ['id', 'title', 'description'] }
+                ]
+            });
             if (!specialityMethod) {
                 return next(ApiError.notFound('Speciality method not found'));
             }
@@ -69,11 +84,10 @@ class SpecialityMethodsController {
         try {
             const { query } = req.query;
             const specialityMethods = await Speciality_method.findAll({
-                where: {
-                    specialityId: {
-                        [Op.like]: `%${query}%`
-                    }
-                }
+                include: [
+                    { model: Speciality, where: { code: { [Op.like]: `%${query}%` } }, attributes: ['id', 'code'] },
+                    { model: Methodological_rec, attributes: ['id', 'title', 'description'] }
+                ]
             });
             return res.json(specialityMethods);
         } catch (error) {

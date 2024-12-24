@@ -16,11 +16,10 @@ const SpecialityMethodologicalModal = ({ show, onHide, specialityMethodologicals
               console.log('Speciality:', sm.Speciality); // Логируем специальность
               console.log('Methodological_rec:', sm.Methodological_rec); // Логируем методичку
               return (
-<ListGroup.Item key={sm.id}>
-  {sm?.Speciality?.name || 'Специальность отсутствует'} - 
-  {sm?.Methodological_rec?.title || 'Методичка отсутствует'}
-</ListGroup.Item>
-
+                <ListGroup.Item key={sm.id}>
+                  {sm?.Speciality?.code || 'Специальность отсутствует'} - 
+                  {sm?.Methodological_rec?.title || 'Методичка отсутствует'}
+                </ListGroup.Item>
               );
             })}
           </ListGroup>

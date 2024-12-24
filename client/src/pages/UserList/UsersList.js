@@ -114,7 +114,6 @@ const handleEdit = () => {
           <Col md={4}>
             <div className="content-box filter-box">
               <Search />
-              <Report />
               {currentUser.user.roles.includes("ADMIN") && ( 
                 <>
                 <h5>Создать преподавателя</h5>
