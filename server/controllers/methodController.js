@@ -40,8 +40,6 @@ class MethodController {
         }
     }
     
-    
-
     async getAll(req, res) {
         try {
             const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {}, year } = req.query;
@@ -73,6 +71,8 @@ class MethodController {
                 offset,
                 order: [[sortBy, order]]
             });
+
+            console.log("Методички:", met.rows); // Логируем результат
     
             return res.json({
                 total: met.count,
@@ -84,7 +84,6 @@ class MethodController {
             return res.status(500).json({ error: 'Failed to retrieve methodological records' });
         }
     }
-    
 
     async getOne(req, res, next) {
         const { id } = req.query;

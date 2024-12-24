@@ -5,55 +5,48 @@ import { Document, Packer, Paragraph, TextRun } from 'docx';
 const Report = ({ userId }) => {
   const [selectedYear, setSelectedYear] = useState('');
 
-  // Функция для получения методичек за выбранный год с сервера
   const fetchMethodsByYear = async (year) => {
     try {
-      const response = await fetch(`/api/method?year=${year}&userId=${userId}`);
+      const response = await fetch(`/api/methods/all?year=${year}&userId=${userId}`);
       
-      // Проверяем статус ответа
       if (!response.ok) {
+        console.error(`Ошибка: ${response.statusText}`);
         throw new Error(`Ошибка: ${response.statusText}`);
       }
-    
-      const text = await response.text();  // Получаем ответ как текст
-      console.log("Ответ от сервера: ", text);  // Логируем ответ в консоль
-    
-      // Если ответ является JSON, пытаемся его распарсить
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (error) {
-        console.error("Ошибка при парсинге JSON: ", error);
-        throw new Error('Ответ не является корректным JSON');
+      
+      const text = await response.text();
+      console.log("Ответ от сервера: ", text);
+
+      if (text.startsWith('<')) {
+        console.error("Получен HTML вместо JSON:", text);
+        throw new Error('Получен HTML вместо JSON');
       }
-    
-      return data;
+
+      const data = JSON.parse(text);
+      return data.data; // Предполагая, что данные возвращаются в ключе 'data'
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
       alert('Произошла ошибка при загрузке данных');
-      return []; // Возвращаем пустой массив в случае ошибки
+      return [];
     }
   };
   
-  // Функция для генерации отчета в формате docx
   const generateReport = async () => {
     if (!selectedYear) {
       alert('Пожалуйста, выберите год для отчета');
       return;
     }
 
-    // Получаем методички за выбранный год
     const methods = await fetchMethodsByYear(selectedYear);
-    
+    console.log("Полученные методички: ", methods);
+
     if (!methods || methods.length === 0) {
       alert('Нет методичек за этот год');
       return;
     }
 
-    // Создаем новый документ
     const doc = new Document();
 
-    // Добавляем заголовок
     doc.addSection({
       children: [
         new Paragraph({
@@ -68,7 +61,6 @@ const Report = ({ userId }) => {
       ],
     });
 
-    // Добавляем методички
     methods.forEach((method) => {
       doc.addSection({
         children: [
@@ -106,7 +98,6 @@ const Report = ({ userId }) => {
       });
     });
 
-    // Генерируем файл и скачиваем его
     const blob = await Packer.toBlob(doc);
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
