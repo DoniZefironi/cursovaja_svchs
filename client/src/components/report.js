@@ -14,27 +14,27 @@ const Report = ({ userId }) => {
       if (!response.ok) {
         throw new Error(`Ошибка: ${response.statusText}`);
       }
-  
+    
       const text = await response.text();  // Получаем ответ как текст
-      console.log(text);  // Логируем ответ в консоль
-  
+      console.log("Ответ от сервера: ", text);  // Логируем ответ в консоль
+    
       // Если ответ является JSON, пытаемся его распарсить
       let data;
       try {
         data = JSON.parse(text);
       } catch (error) {
+        console.error("Ошибка при парсинге JSON: ", error);
         throw new Error('Ответ не является корректным JSON');
       }
-  
+    
       return data;
     } catch (error) {
       console.error('Ошибка при получении данных:', error);
       alert('Произошла ошибка при загрузке данных');
+      return []; // Возвращаем пустой массив в случае ошибки
     }
   };
   
-  
-
   // Функция для генерации отчета в формате docx
   const generateReport = async () => {
     if (!selectedYear) {
@@ -45,7 +45,7 @@ const Report = ({ userId }) => {
     // Получаем методички за выбранный год
     const methods = await fetchMethodsByYear(selectedYear);
     
-    if (methods.length === 0) {
+    if (!methods || methods.length === 0) {
       alert('Нет методичек за этот год');
       return;
     }
