@@ -1,61 +1,131 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import { jsPDF } from 'jspdf';
-import autoTable from "jspdf-autotable";
-import axios from 'axios';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 
 const Report = ({ userId }) => {
-  const [user, setUser] = useState(null);
-  const [methodologicals, setMethodologicals] = useState([]);
+  const [selectedYear, setSelectedYear] = useState('');
 
-  useEffect(() => {
-    if (!userId) {
-      console.error("User ID is undefined");
+  // Функция для получения методичек за выбранный год с сервера
+  const fetchMethodsByYear = async (year) => {
+    try {
+      const response = await fetch(`/api/method?year=${year}&userId=${userId}`);
+      
+      // Проверяем статус ответа
+      if (!response.ok) {
+        throw new Error(`Ошибка: ${response.statusText}`);
+      }
+  
+      const text = await response.text();  // Получаем ответ как текст
+      console.log(text);  // Логируем ответ в консоль
+  
+      // Если ответ является JSON, пытаемся его распарсить
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (error) {
+        throw new Error('Ответ не является корректным JSON');
+      }
+  
+      return data;
+    } catch (error) {
+      console.error('Ошибка при получении данных:', error);
+      alert('Произошла ошибка при загрузке данных');
+    }
+  };
+  
+  
+
+  // Функция для генерации отчета в формате docx
+  const generateReport = async () => {
+    if (!selectedYear) {
+      alert('Пожалуйста, выберите год для отчета');
       return;
     }
-    console.log("Fetching report for User ID:", userId); 
 
-    const fetchUserReport = async () => {
-      try {
-        const response = await axios.get(`/api/report/${userId}`);
-        setUser(response.data.user);
-        setMethodologicals(response.data.methodologicals);
-      } catch (error) {
-        console.error("Error fetching user report:", error);
-      }
-    };
+    // Получаем методички за выбранный год
+    const methods = await fetchMethodsByYear(selectedYear);
+    
+    if (methods.length === 0) {
+      alert('Нет методичек за этот год');
+      return;
+    }
 
-    fetchUserReport();
-  }, [userId]);
+    // Создаем новый документ
+    const doc = new Document();
 
-  const generatePDF = () => {
-    if (!user || !methodologicals.length) return;
-
-    const pdfDoc = new jsPDF();
-    pdfDoc.setFont("times", "bold");
-    pdfDoc.setFontSize(14);
-    const formattedDate = new Date().toLocaleDateString();
-
-    pdfDoc.text(`User Report. Date: ${formattedDate}`, 10, 10);
-    pdfDoc.text(`Name: ${user.name} ${user.surname}`, 10, 20);
-
-    const columns = ["Methodological ID", "Title"];
-    const rows = methodologicals.map(item => [item.methodologicalId, item.title]);
-
-    autoTable(pdfDoc, {
-      theme: "grid",
-      head: [columns],
-      body: rows,
-      startY: 40,
+    // Добавляем заголовок
+    doc.addSection({
+      children: [
+        new Paragraph({
+          children: [
+            new TextRun('Отчет о методических рекомендациях'),
+            new TextRun({
+              text: `\nГод: ${selectedYear}`,
+              bold: true,
+            }),
+          ],
+        }),
+      ],
     });
 
-    pdfDoc.save("UserReport.pdf");
+    // Добавляем методички
+    methods.forEach((method) => {
+      doc.addSection({
+        children: [
+          new Paragraph({
+            children: [
+              new TextRun(`Методичка: ${method.title}`),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun(`Описание: ${method.description || 'Нет описания'}`),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun(`Язык: ${method.language || 'Не указан'}`),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun(`Год создания: ${method.year_create || 'Не указан'}`),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun(`Дата выпуска: ${method.date_realese || 'Не указана'}`),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun(`Количество страниц: ${method.quantity_pages || 'Не указано'}`),
+            ],
+          }),
+        ],
+      });
+    });
+
+    // Генерируем файл и скачиваем его
+    const blob = await Packer.toBlob(doc);
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Отчет_${selectedYear}.docx`;
+    link.click();
   };
 
   return (
-    <div className="report-section mt-3">
-      <h5>Отчет</h5>
-      <Button variant="light" className="download-button" onClick={generatePDF}>Скачать</Button>
+    <div>
+      <div>
+        <label>Выберите год: </label>
+        <input
+          type="number"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+          placeholder="Введите год"
+        />
+      </div>
+      <Button onClick={generateReport}>Создать отчет</Button>
     </div>
   );
 };
