@@ -3,24 +3,18 @@ import { makeAutoObservable } from 'mobx';
 
 class SyllabusStore {
     syllabuses = [];
-    syllabus = null;
     currentPage = 1;
     totalPages = 1;
     searchQuery = '';
     loading = false;
     error = null;
 
-    constructor(userMain) {
-        this.userMain = userMain; 
+    constructor() {
         makeAutoObservable(this);
     }
 
     setSyllabuses = (syllabuses) => {
         this.syllabuses = syllabuses;
-    }
-
-    setSyllabus = (syllabus) => {
-        this.syllabus = syllabus;
     }
 
     setPage = (page) => {
@@ -59,13 +53,13 @@ class SyllabusStore {
         }
     }
 
-    fetchSyllabusById = async (id) => {
+    fetchAllSyllabuses = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/syllabus/one?id=${id}`);
-            this.setSyllabus(response.data);
+            const response = await axios.get('http://localhost:5000/api/syllabus/all', { params: { limit: 1000 } });
+            this.setSyllabuses(response.data.data);
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch syllabus');
+            this.setError(error.response?.data || 'Failed to fetch all syllabuses');
         } finally {
             this.setLoading(false);
         }
@@ -154,7 +148,7 @@ class SyllabusStore {
         this.setLoading(true);
         try {
             const response = await axios.get(`http://localhost:5000/api/syllabus/download/${filename}`, {
-                responseType: 'blob' 
+                responseType: 'blob'
             });
 
             const url = window.URL.createObjectURL(new Blob([response.data]));

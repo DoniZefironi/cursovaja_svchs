@@ -8,34 +8,36 @@ import Search from '../../components/search';
 import { FaPlus, FaMinus, FaEdit } from 'react-icons/fa';
 
 const SubjectContainer = observer(() => {
-  const { subject, user } = useContext(Context);
+  const { subject, syllabus, user } = useContext(Context);
   const { subjects, fetchSubjects, createSubject, updateSubject, currentPage, totalPages, setPage } = subject;
+  const { syllabuses, fetchAllSyllabuses } = syllabus;
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [currentSubject, setCurrentSubject] = useState({ id: null, name: '', description: '' });
-  const [newSubject, setNewSubject] = useState({ name: '', description: '' });
+  const [currentSubject, setCurrentSubject] = useState({ id: null, name: '', description: '', syllabusId: '' });
+  const [newSubject, setNewSubject] = useState({ name: '', description: '', syllabusId: '' });
 
   useEffect(() => {
     fetchSubjects(currentPage);
-  }, [fetchSubjects, currentPage]);
+    fetchAllSyllabuses();
+  }, [fetchSubjects, fetchAllSyllabuses, currentPage]);
 
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   const handleCreate = () => {
-    createSubject(newSubject.name, newSubject.description);
+    createSubject(newSubject.name, newSubject.description, newSubject.syllabusId);
     setShowCreateModal(false);
-    setNewSubject({ name: '', description: '' });
-    window.location.reload();  
+    setNewSubject({ name: '', description: '', syllabusId: '' });
+    window.location.reload();
   };
 
   const handleEdit = () => {
-    updateSubject(currentSubject.id, currentSubject.name, currentSubject.description);
+    updateSubject(currentSubject.id, currentSubject.name, currentSubject.description, currentSubject.syllabusId);
     setShowEditModal(false);
-    setCurrentSubject({ id: null, name: '', description: '' });
-    window.location.reload();  
+    setCurrentSubject({ id: null, name: '', description: '', syllabusId: '' });
+    window.location.reload();
   };
 
   const handleChange = (e, key, isNew = false) => {
@@ -154,6 +156,19 @@ const SubjectContainer = observer(() => {
                 onChange={(e) => handleChange(e, 'description', true)}
               />
             </Form.Group>
+            <Form.Group controlId="formCreateSyllabus" className="mt-3">
+              <Form.Label>Силлабус</Form.Label>
+              <Form.Control
+                as="select"
+                value={newSubject.syllabusId}
+                onChange={(e) => handleChange(e, 'syllabusId', true)}
+              >
+                <option value="">Выберите силлабус</option>
+                {syllabuses && syllabuses.map((syllabus) => (
+                  <option key={syllabus.id} value={syllabus.id}>{syllabus.name}</option>
+                ))}
+              </Form.Control>
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -186,6 +201,19 @@ const SubjectContainer = observer(() => {
                 value={currentSubject.description}
                 onChange={(e) => handleChange(e, 'description')}
               />
+            </Form.Group>
+            <Form.Group controlId="formEditSyllabus" className="mt-3">
+              <Form.Label>Силлабус</Form.Label>
+              <Form.Control
+                as="select"
+                value={currentSubject.syllabusId}
+                onChange={(e) => handleChange(e, 'syllabusId')}
+              >
+                <option value="">Выберите силлабус</option>
+                {syllabuses && syllabuses.map((syllabus) => (
+                  <option key={syllabus.id} value={syllabus.id}>{syllabus.name}</option>
+                ))}
+              </Form.Control>
             </Form.Group>
           </Form>
         </Modal.Body>

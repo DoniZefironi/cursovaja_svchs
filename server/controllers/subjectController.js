@@ -5,8 +5,8 @@ const { Op } = require('sequelize');
 class SubjectController {
     async create(req, res) {
         try {
-            const { name, description } = req.body;
-            const subject = await Subject.create({ name, description });
+            const { name, description, syllabusId } = req.body;
+            const subject = await Subject.create({ name, description, syllabusId });
             return res.json(subject);
         } catch (error) {
             console.error('Failed to create subject:', error);
@@ -17,12 +17,12 @@ class SubjectController {
     async update(req, res) {
         try {
             const { id } = req.params;
-            const { name, description } = req.body;
+            const { name, description, syllabusId } = req.body;
             const subject = await Subject.findByPk(id);
             if (!subject) {
                 return res.status(404).json({ message: 'Subject not found' });
             }
-            await subject.update({ name, description });
+            await subject.update({ name, description, syllabusId });
             return res.json(subject);
         } catch (error) {
             console.error('Failed to update subject:', error);

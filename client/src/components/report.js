@@ -183,7 +183,7 @@ const Report = observer(() => {
       </div>
       <div>
         <label>Выберите специальность: </label>
-        <select value={selectedSpeciality} onChange={(e) => setSelectedSpeciality(e.target.value)}>
+        <select style={{width: "100%"}} value={selectedSpeciality} onChange={(e) => setSelectedSpeciality(e.target.value)}>
           <option value="">Выберите специальность</option>
           {specialities && specialities.map(spec => (
             <option key={spec.id} value={spec.id}>{spec.qualification}</option>
@@ -192,7 +192,7 @@ const Report = observer(() => {
       </div>
       <div>
         <label>Выберите автора: </label>
-        <select value={selectedAuthor} onChange={(e) => setSelectedAuthor(e.target.value)}>
+        <select style={{width: "100%"}} value={selectedAuthor} onChange={(e) => setSelectedAuthor(e.target.value)}>
           <option value="">Выберите автора</option>
           {users && users.map(author => (
             <option key={author.id} value={author.id}>{author.name} {author.surname}</option>
