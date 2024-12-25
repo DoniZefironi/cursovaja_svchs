@@ -78,7 +78,7 @@ const MethodModal = ({ show, onHide, method, handleChange, handleFileChange, han
               onChange={(e) => handleChange(e, 'subjectId')}
             >
               <option value="">Выберите предмет</option>
-              {subjects.map(subject => (
+              {subjects && subjects.map(subject => (
                 <option key={subject.id} value={subject.id}>{subject.name}</option>
               ))}
             </Form.Control>

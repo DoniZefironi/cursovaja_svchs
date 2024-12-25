@@ -72,7 +72,7 @@ class MethodController {
                 order: [[sortBy, order]]
             });
 
-            console.log("Методички:", met.rows); // Логируем результат
+            console.log("Методички:", met.rows); 
     
             return res.json({
                 total: met.count,

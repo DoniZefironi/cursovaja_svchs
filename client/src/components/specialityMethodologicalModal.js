@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Button, ListGroup } from 'react-bootstrap';
 
 const SpecialityMethodologicalModal = ({ show, onHide, specialityMethodologicals = [] }) => {
-  console.log('SpecialityMethodologicals:', specialityMethodologicals); // Логируем данные
+  console.log('SpecialityMethodologicals:', specialityMethodologicals); 
 
   return (
     <Modal show={show} onHide={onHide}>
@@ -13,8 +13,8 @@ const SpecialityMethodologicalModal = ({ show, onHide, specialityMethodologicals
         {Array.isArray(specialityMethodologicals) && specialityMethodologicals.length > 0 ? (
           <ListGroup>
             {specialityMethodologicals.map((sm) => {
-              console.log('Speciality:', sm.Speciality); // Логируем специальность
-              console.log('Methodological_rec:', sm.Methodological_rec); // Логируем методичку
+              console.log('Speciality:', sm.Speciality); 
+              console.log('Methodological_rec:', sm.Methodological_rec); 
               return (
                 <ListGroup.Item key={sm.id}>
                   {sm?.Speciality?.code || 'Специальность отсутствует'} - 

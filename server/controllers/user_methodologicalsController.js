@@ -26,7 +26,7 @@ class UserMethodologicalsController {
                     { model: Methodological_rec, attributes: ['id', 'title'] }
                 ]
             });
-            console.log('Fetched User Methodologicals:', userMethodologicals); // Логирование для проверки
+            console.log('Fetched User Methodologicals:', userMethodologicals);
             return res.json(userMethodologicals);
         } catch (error) {
             next(ApiError.internal(error.message));
