@@ -1,5 +1,8 @@
-import axios from 'axios';
 import { makeAutoObservable } from "mobx";
+import {
+    fetchSubjects, fetchAllSyllabuses, searchSubjects,
+    createSubject, updateSubject
+} from '../api'; // Импортируем функции API
 
 class SubjectStore {
     subjects = [];
@@ -41,9 +44,7 @@ class SubjectStore {
     fetchSubjects = async (page = 1) => {
         try {
             console.log("Fetching subjects from API...");
-            const response = await axios.get('http://localhost:5000/api/subject/all', {
-                params: { page, limit: this.pageSize }
-            });
+            const response = await fetchSubjects(page, this.pageSize);
             console.log("Fetched subjects from API:", response.data.data);
             this.setSubjects(response.data.data);
             this.setTotalPages(response.data.pages);
@@ -56,7 +57,7 @@ class SubjectStore {
     fetchAllSyllabuses = async () => {
         try {
             console.log("Fetching all syllabuses from API...");
-            const response = await axios.get('http://localhost:5000/api/syllabus/all', { params: { limit: 1000 } }); // Увеличиваем лимит для получения всех силлабусов
+            const response = await fetchAllSyllabuses();
             console.log("Fetched all syllabuses from API:", response.data.data);
             this.setSyllabuses(response.data.data);
         } catch (error) {
@@ -69,9 +70,7 @@ class SubjectStore {
             console.log("Clearing subjects list...");
             this.setSubjects([]);
             console.log("Searching subjects with query:", this.searchQuery);
-            const response = await axios.get(`http://localhost:5000/api/subject/search`, {
-                params: { query: this.searchQuery }
-            });
+            const response = await searchSubjects(this.searchQuery);
             console.log("Fetched search results from API:", response.data);
             this.setSubjects(response.data);
         } catch (error) {
@@ -82,7 +81,7 @@ class SubjectStore {
 
     createSubject = async (name, description, syllabusId) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/subject/create', { name, description, syllabusId });
+            const response = await createSubject(name, description, syllabusId);
             this.setSubjects([...this.subjects, response.data]);
         } catch (error) {
             console.error('Failed to create subject:', error);
@@ -91,7 +90,7 @@ class SubjectStore {
 
     updateSubject = async (id, name, description, syllabusId) => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/subject/${id}`, { name, description, syllabusId });
+            const response = await updateSubject(id, name, description, syllabusId);
             this.setSubjects(this.subjects.map(sub => (sub.id === id ? response.data : sub)));
         } catch (error) {
             console.error('Failed to update subject:', error);

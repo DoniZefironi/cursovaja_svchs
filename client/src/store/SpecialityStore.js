@@ -1,5 +1,8 @@
-import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
+import {
+    fetchSpecialities, fetchMethodologicals, createSpecialityMethodological,
+    fetchSpecialityMethodologicals, searchSpecialityMethodologicals
+} from '../api'; // Импортируем функции API
 
 class SpecialityStore {
     specialities = [];
@@ -30,7 +33,7 @@ class SpecialityStore {
     fetchSpecialities = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/speciality/all', { withCredentials: true });
+            const response = await fetchSpecialities();
             console.log('Fetched Specialities from API:', response.data);
             this.setSpecialities(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
@@ -44,7 +47,7 @@ class SpecialityStore {
     fetchMethodologicals = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/method/all', { withCredentials: true });
+            const response = await fetchMethodologicals();
             console.log('Fetched Methodologicals from API:', response.data);
             this.setMethodologicals(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
@@ -58,11 +61,7 @@ class SpecialityStore {
     createSpecialityMethodological = async (formData) => {
         this.setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/speciality_method/create', formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await createSpecialityMethodological(formData);
             console.log('SpecialityMethodological created:', response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create speciality methodological');
@@ -75,7 +74,7 @@ class SpecialityStore {
     fetchSpecialityMethodologicals = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/speciality_method/all', { withCredentials: true });
+            const response = await fetchSpecialityMethodologicals();
             console.log('Fetched SpecialityMethodologicals:', response.data);
             return response.data;
         } catch (error) {
@@ -89,10 +88,7 @@ class SpecialityStore {
     searchSpecialityMethodologicals = async (query) => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/speciality_method/search', {
-                params: { query },
-                withCredentials: true
-            });
+            const response = await searchSpecialityMethodologicals(query);
             this.setSpecialities(response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to search speciality methodologicals');

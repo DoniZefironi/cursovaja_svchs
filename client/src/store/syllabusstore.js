@@ -1,5 +1,9 @@
-import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
+import {
+    fetchSyllabuses, fetchAllSyllabuses, createSyllabus,
+    updateSyllabus, deleteSyllabus, searchSyllabuses,
+    fetchSyllabusesByYear, downloadSyllabus
+} from '../api'; 
 
 class SyllabusStore {
     syllabuses = [];
@@ -40,9 +44,7 @@ class SyllabusStore {
     fetchSyllabuses = async (page = 1) => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/syllabus/all', {
-                params: { page, limit: 10 }
-            });
+            const response = await fetchSyllabuses(page, 10);
             this.setSyllabuses(response.data.data);
             this.setTotalPages(response.data.pages);
             this.setPage(page);
@@ -56,7 +58,7 @@ class SyllabusStore {
     fetchAllSyllabuses = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/syllabus/all', { params: { limit: 1000 } });
+            const response = await fetchAllSyllabuses();
             this.setSyllabuses(response.data.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch all syllabuses');
@@ -68,11 +70,7 @@ class SyllabusStore {
     createSyllabus = async (formData) => {
         this.setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/syllabus/create', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await createSyllabus(formData);
             this.setSyllabuses([...this.syllabuses, response.data]);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create syllabus');
@@ -84,11 +82,7 @@ class SyllabusStore {
     updateSyllabus = async (id, formData) => {
         this.setLoading(true);
         try {
-            const response = await axios.put(`http://localhost:5000/api/syllabus/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await updateSyllabus(id, formData);
             this.setSyllabuses(this.syllabuses.map(syllabus => (syllabus.id === id ? response.data : syllabus)));
         } catch (error) {
             this.setError(error.response?.data || 'Failed to update syllabus');
@@ -100,7 +94,7 @@ class SyllabusStore {
     deleteSyllabus = async (id) => {
         this.setLoading(true);
         try {
-            await axios.delete(`http://localhost:5000/api/syllabus/${id}`);
+            await deleteSyllabus(id);
             this.setSyllabuses(this.syllabuses.filter(syllabus => syllabus.id !== id));
         } catch (error) {
             this.setError(error.response?.data || 'Failed to delete syllabus');
@@ -117,9 +111,7 @@ class SyllabusStore {
         }
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/syllabus/search', {
-                params: { query: this.searchQuery }
-            });
+            const response = await searchSyllabuses(this.searchQuery);
             this.setSyllabuses(response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to search syllabuses');
@@ -131,9 +123,7 @@ class SyllabusStore {
     fetchSyllabusesByYear = async (year, page = 1) => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/syllabus/all', {
-                params: { year, page, limit: 10 }
-            });
+            const response = await fetchSyllabusesByYear(year, page, 10);
             this.setSyllabuses(response.data.data);
             this.setTotalPages(response.data.pages);
             this.setPage(page);
@@ -147,9 +137,7 @@ class SyllabusStore {
     downloadSyllabus = async (filename) => {
         this.setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/syllabus/download/${filename}`, {
-                responseType: 'blob'
-            });
+            const response = await downloadSyllabus(filename);
 
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');

@@ -1,6 +1,5 @@
-// store/UserStore.js
-import axios from 'axios';
 import { makeAutoObservable } from "mobx";
+import { fetchUsers, searchUsers, createUser, updateUser } from '../api'; 
 
 class UserStore {
     users = [];
@@ -36,10 +35,7 @@ class UserStore {
     fetchUsers = async (page = 1) => {
         try {
             console.log(`Fetching users from API for page ${page}...`);
-            const response = await axios.get('http://localhost:5000/api/user/all', {
-                params: { page, limit: this.pageSize },
-                withCredentials: true
-            });
+            const response = await fetchUsers(page, this.pageSize);
             console.log("Fetched users from API:", response.data.data);
             this.setUsers(response.data.data);
             this.setTotalPages(response.data.pages);
@@ -52,10 +48,7 @@ class UserStore {
     searchUsers = async () => {
         try {
             console.log("Searching users with query:", this.userSearchQuery);
-            const response = await axios.get('http://localhost:5000/api/user/search', {
-                params: { query: this.userSearchQuery },
-                withCredentials: true
-            });
+            const response = await searchUsers(this.userSearchQuery);
             console.log("Fetched user search results from API:", response.data);
             this.setUsers(response.data);
         } catch (error) {
@@ -69,9 +62,7 @@ class UserStore {
 
     createUser = async (email, password, name, surname, patronymic, phone_number, position, roles) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/user/registration', {
-                email, password, name, surname, patronymic, phone_number, position, roles
-            });
+            const response = await createUser(email, password, name, surname, patronymic, phone_number, position, roles);
             this.setUsers([...this.users, response.data]);
         } catch (error) {
             console.error('Failed to create user:', error);
@@ -83,9 +74,7 @@ class UserStore {
 
     updateUser = async (id, name, surname, patronymic, email, phone_number, position, roles) => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/user/${id}`, {
-                name, surname, patronymic, email, phone_number, position, roles
-            });
+            const response = await updateUser(id, name, surname, patronymic, email, phone_number, position, roles);
             this.setUsers(this.users.map(user => (user.id === id ? response.data : user)));
         } catch (error) {
             console.error('Failed to update user:', error);

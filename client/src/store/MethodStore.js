@@ -1,5 +1,11 @@
-import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
+import {
+    fetchMethodsByYear, fetchMethods, fetchMethodologicalById,
+    fetchSubjects, fetchTypeMethods, fetchUsers, searchMethods,
+    createMethod, fetchUserMethodologicals, searchUserMethodologicals,
+    createUserMethodological, fetchSpecialityMethodologicals, searchSpecialityMethodologicals,
+    createSpecialityMethodological, updateMethod, deleteMethod, downloadMethod
+} from '../api'; // Импортируем функции API
 
 class MethodStore {
     methods = [];
@@ -61,9 +67,7 @@ class MethodStore {
     fetchMethodsByYear = async (year, page = 1) => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/method/all', {
-                params: { year, page, limit: 10 }
-            });
+            const response = await fetchMethodsByYear(year, page, 10);
             this.setMethods(response.data.data);
             this.setTotalPages(response.data.pages);
             this.setPage(page);
@@ -77,9 +81,7 @@ class MethodStore {
     fetchMethods = async (page = 1) => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/method/all', {
-                params: { page, limit: 10 },
-            });
+            const response = await fetchMethods(page, 10);
             this.setMethods(response.data.data);
             this.setTotalPages(response.data.pages);
             this.setPage(page);
@@ -93,7 +95,7 @@ class MethodStore {
     fetchMethodologicalById = async (id) => {
         this.setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/method/one/${id}`);
+            const response = await fetchMethodologicalById(id);
             return response.data;
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch method by ID');
@@ -105,7 +107,7 @@ class MethodStore {
     fetchSubjects = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/subject/all', { withCredentials: true });
+            const response = await fetchSubjects();
             this.setSubjects(response.data.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch subjects');
@@ -117,7 +119,7 @@ class MethodStore {
     fetchTypeMethods = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/type_method/all', { withCredentials: true });
+            const response = await fetchTypeMethods();
             this.setTypeMethods(response.data.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch type methods');
@@ -129,7 +131,7 @@ class MethodStore {
     fetchUsers = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/user/all', { withCredentials: true });
+            const response = await fetchUsers();
             this.setUsers(response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch users');
@@ -146,9 +148,7 @@ class MethodStore {
         }
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/method/search', {
-                params: { query: this.searchQuery }
-            });
+            const response = await searchMethods(this.searchQuery);
             this.setMethods(response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to search methods');
@@ -160,11 +160,7 @@ class MethodStore {
     createMethod = async (formData) => {
         this.setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/method/create', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await createMethod(formData);
             this.setMethods([...this.methods, response.data]);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create method');
@@ -176,7 +172,7 @@ class MethodStore {
     fetchUserMethodologicals = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/user_methodological/all', { withCredentials: true });
+            const response = await fetchUserMethodologicals();
             return response.data;
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch user methodologicals');
@@ -189,10 +185,7 @@ class MethodStore {
     searchUserMethodologicals = async (query) => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/user_methodological/search', {
-                params: { query },
-                withCredentials: true
-            });
+            const response = await searchUserMethodologicals(query);
             this.setMethods(response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to search user methodologicals');
@@ -204,11 +197,7 @@ class MethodStore {
     createUserMethodological = async (formData) => {
         this.setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/user_methodological/create', formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await createUserMethodological(formData);
             console.log('UserMethodological created:', response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create user methodological');
@@ -220,7 +209,7 @@ class MethodStore {
     fetchSpecialityMethodologicals = async () => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/speciality_method/all', { withCredentials: true });
+            const response = await fetchSpecialityMethodologicals();
             return response.data;
         } catch (error) {
             this.setError(error.response?.data || 'Failed to fetch speciality methodologicals');
@@ -233,10 +222,7 @@ class MethodStore {
     searchSpecialityMethodologicals = async (query) => {
         this.setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/speciality_method/search', {
-                params: { query },
-                withCredentials: true
-            });
+            const response = await searchSpecialityMethodologicals(query);
             this.setMethods(response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to search speciality methodologicals');
@@ -248,11 +234,7 @@ class MethodStore {
     createSpecialityMethodological = async (formData) => {
         this.setLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/speciality_method/create', formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await createSpecialityMethodological(formData);
             console.log('SpecialityMethodological created:', response.data);
         } catch (error) {
             this.setError(error.response?.data || 'Failed to create speciality methodological');
@@ -264,11 +246,7 @@ class MethodStore {
     updateMethod = async (id, formData) => {
         this.setLoading(true);
         try {
-            const response = await axios.put(`http://localhost:5000/api/method/${id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
+            const response = await updateMethod(id, formData);
             this.setMethods(this.methods.map(method => (method.id === id ? response.data : method)));
         } catch (error) {
             this.setError(error.response?.data || 'Failed to update method');
@@ -280,7 +258,7 @@ class MethodStore {
     deleteMethod = async (id) => {
         this.setLoading(true);
         try {
-            await axios.delete(`http://localhost:5000/api/method/${id}`);
+            await deleteMethod(id);
             this.setMethods(this.methods.filter(method => method.id !== id));
         } catch (error) {
             this.setError(error.response?.data || 'Failed to delete method');
@@ -295,9 +273,7 @@ class MethodStore {
             if (!filename) {
                 throw new Error('Filename is required for download');
             }
-            const response = await axios.get(`http://localhost:5000/api/method/download/${filename}`, {
-                responseType: 'blob'
-            });
+            const response = await downloadMethod(filename);
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
