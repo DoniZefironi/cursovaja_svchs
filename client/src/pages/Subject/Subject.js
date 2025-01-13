@@ -14,7 +14,7 @@ const SubjectContainer = observer(() => {
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [currentSubject, setCurrentSubject] = useState({ id: null, name: '', description: '', syllabusId: '' });
+  const [currentSubject, setCurrentSubject] = useState({ _id: null, name: '', description: '', syllabusId: '' });
   const [newSubject, setNewSubject] = useState({ name: '', description: '', syllabusId: '' });
 
   useEffect(() => {
@@ -34,9 +34,9 @@ const SubjectContainer = observer(() => {
   };
 
   const handleEdit = () => {
-    updateSubject(currentSubject.id, currentSubject.name, currentSubject.description, currentSubject.syllabusId);
+    updateSubject(currentSubject._id, currentSubject.name, currentSubject.description, currentSubject.syllabusId);
     setShowEditModal(false);
-    setCurrentSubject({ id: null, name: '', description: '', syllabusId: '' });
+    setCurrentSubject({ _id: null, name: '', description: '', syllabusId: '' });
     window.location.reload();
   };
 

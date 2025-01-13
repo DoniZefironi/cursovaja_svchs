@@ -15,7 +15,7 @@ const UserContainer = observer(() => {
   const [openIndex, setOpenIndex] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [currentUserEdit, setCurrentUserEdit] = useState({ id: null, name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '' });
+  const [currentUserEdit, setCurrentUserEdit] = useState({ _id: null, name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '' });
   const [newUser, setNewUser] = useState({ name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '', password: '' });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const UserContainer = observer(() => {
 
 const handleEdit = () => {
     updateUser(
-        currentUserEdit.id,
+        currentUserEdit._id,
         currentUserEdit.name,
         currentUserEdit.surname,
         currentUserEdit.patronymic,  
@@ -59,7 +59,7 @@ const handleEdit = () => {
         currentUserEdit.roles
     );
     setShowEditModal(false);
-    setCurrentUserEdit({ id: null, name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '' });
+    setCurrentUserEdit({ _id: null, name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '' });
     window.location.reload(); 
 };
 

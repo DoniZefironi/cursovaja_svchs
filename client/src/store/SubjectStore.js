@@ -2,7 +2,7 @@ import { makeAutoObservable } from "mobx";
 import {
     fetchSubjects, fetchAllSyllabuses, searchSubjects,
     createSubject, updateSubject
-} from '../api'; // Импортируем функции API
+} from '../api'; 
 
 class SubjectStore {
     subjects = [];
@@ -88,10 +88,10 @@ class SubjectStore {
         }
     }
 
-    updateSubject = async (id, name, description, syllabusId) => {
+    updateSubject = async (_id, name, description, syllabusId) => {
         try {
-            const response = await updateSubject(id, name, description, syllabusId);
-            this.setSubjects(this.subjects.map(sub => (sub.id === id ? response.data : sub)));
+            const response = await updateSubject(_id, name, description, syllabusId);
+            this.setSubjects(this.subjects.map(sub => (sub.id === _id ? response.data : sub)));
         } catch (error) {
             console.error('Failed to update subject:', error);
         }

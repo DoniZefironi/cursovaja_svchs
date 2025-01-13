@@ -76,15 +76,15 @@ const MethodContainer = observer(() => {
     if (file) {
       formData.append('file', file);
     }
-    updateMethod(currentMethod.id, formData);
+    updateMethod(currentMethod._id, formData);
     setShowEditModal(false);
     setCurrentMethod({ title: '', description: '', language: '', year_create: '', date_realese: '', file: '', quantity_pages: '', subjectId: '', TypeMethodId: '' });
     setFile(null);
     window.location.reload();  
   };
 
-  const handleDelete = (id) => {
-    deleteMethod(id);
+  const handleDelete = (_id) => {
+    deleteMethod(_id);
     window.location.reload();  
   };
 
@@ -133,12 +133,23 @@ const MethodContainer = observer(() => {
 };
 
 
-  const handleViewUserMethodological = async (methodId) => {
+const handleViewUserMethodological = async (methodId) => {
+  try {
     const userMethodologicals = await fetchUserMethodologicals();
+
+    // Проверяем, что userMethodologicals является массивом
+    if (!Array.isArray(userMethodologicals)) {
+      throw new TypeError('Expected userMethodologicals to be an array');
+    }
+
     const filteredUserMethodologicals = userMethodologicals.filter((um) => um.methodologicalRecId === methodId);
     setUserMethodologicals(filteredUserMethodologicals);
     setShowUserMethodModal(true);
-  };
+  } catch (error) {
+    console.error('Error fetching or filtering UserMethodological:', error);
+  }
+};
+
 
   const handleCreateSpecialityMethodological = (methodId) => {
     setSelectedMethodId(methodId);

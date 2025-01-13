@@ -72,10 +72,10 @@ class UserStore {
         }
     }
 
-    updateUser = async (id, name, surname, patronymic, email, phone_number, position, roles) => {
+    updateUser = async (_id, name, surname, patronymic, email, phone_number, position, roles) => {
         try {
-            const response = await updateUser(id, name, surname, patronymic, email, phone_number, position, roles);
-            this.setUsers(this.users.map(user => (user.id === id ? response.data : user)));
+            const response = await updateUser(_id, name, surname, patronymic, email, phone_number, position, roles);
+            this.setUsers(this.users.map(user => (user.id === _id ? response.data : user)));
         } catch (error) {
             console.error('Failed to update user:', error);
         }

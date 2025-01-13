@@ -14,7 +14,7 @@ const SyllabusContainer = observer(() => {
   const { syllabuses, fetchSyllabuses, createSyllabus, updateSyllabus, deleteSyllabus, downloadSyllabus, currentPage, totalPages } = syllabus;
   const [openIndex, setOpenIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [currentSyllabus, setCurrentSyllabus] = useState({ id: null, name: '', date: '', syllfile: '' });
+  const [currentSyllabus, setCurrentSyllabus] = useState({ _id: null, name: '', date: '', syllfile: '' });
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const SyllabusContainer = observer(() => {
 
     createSyllabus(formData);
     setShowModal(false);
-    setCurrentSyllabus({ id: null, name: '', date: '', syllfile: '' });
+    setCurrentSyllabus({ _id: null, name: '', date: '', syllfile: '' });
     window.location.reload();  
   };
 
@@ -47,9 +47,9 @@ const SyllabusContainer = observer(() => {
       formData.append('syllfile', currentSyllabus.syllfile);
     }
 
-    updateSyllabus(currentSyllabus.id, formData);
+    updateSyllabus(currentSyllabus._id, formData);
     setShowModal(false);
-    setCurrentSyllabus({ id: null, name: '', date: '', syllfile: '' });
+    setCurrentSyllabus({ _id: null, name: '', date: '', syllfile: '' });
     window.location.reload();  
   };
 

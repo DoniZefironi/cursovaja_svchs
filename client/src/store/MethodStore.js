@@ -299,12 +299,12 @@ class MethodStore {
         }
     }
 
-    updateMethod = async (id, formData) => {
+    updateMethod = async (_id, formData) => {
         this.setLoading(true);
         try {
-            const response = await updateMethod(id, formData);
+            const response = await updateMethod(_id, formData);
             if (response.data) {
-                this.setMethods(this.methods.map(method => (method.id === id ? response.data : method)));
+                this.setMethods(this.methods.map(method => (method.id === _id ? response.data : method)));
             } else {
                 throw new Error('Invalid response structure');
             }
@@ -315,11 +315,11 @@ class MethodStore {
         }
     }
 
-    deleteMethod = async (id) => {
+    deleteMethod = async (_id) => {
         this.setLoading(true);
         try {
-            await deleteMethod(id);
-            this.setMethods(this.methods.filter(method => method.id !== id));
+            await deleteMethod(_id);
+            this.setMethods(this.methods.filter(method => method.id !== _id));
         } catch (error) {
             this.setError(error.response?.data || error.message || 'Failed to delete method');
         } finally {

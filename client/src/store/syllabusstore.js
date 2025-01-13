@@ -79,11 +79,11 @@ class SyllabusStore {
         }
     }
 
-    updateSyllabus = async (id, formData) => {
+    updateSyllabus = async (_id, formData) => {
         this.setLoading(true);
         try {
-            const response = await updateSyllabus(id, formData);
-            this.setSyllabuses(this.syllabuses.map(syllabus => (syllabus.id === id ? response.data : syllabus)));
+            const response = await updateSyllabus(_id, formData);
+            this.setSyllabuses(this.syllabuses.map(syllabus => (syllabus.id === _id ? response.data : syllabus)));
         } catch (error) {
             this.setError(error.response?.data || 'Failed to update syllabus');
         } finally {
@@ -91,11 +91,11 @@ class SyllabusStore {
         }
     }
 
-    deleteSyllabus = async (id) => {
+    deleteSyllabus = async (_id) => {
         this.setLoading(true);
         try {
-            await deleteSyllabus(id);
-            this.setSyllabuses(this.syllabuses.filter(syllabus => syllabus.id !== id));
+            await deleteSyllabus(_id);
+            this.setSyllabuses(this.syllabuses.filter(syllabus => syllabus.id !== _id));
         } catch (error) {
             this.setError(error.response?.data || 'Failed to delete syllabus');
         } finally {
