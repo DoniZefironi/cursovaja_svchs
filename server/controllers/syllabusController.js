@@ -1,9 +1,8 @@
 const uuid = require('uuid');
 const path = require('path');
 const fs = require('fs');
-const { Syllabus } = require('../models/models');
+const { Syllabus } = require('../models/models'); 
 const ApiError = require('../error/ApiError');
-const { Op } = require('sequelize');
 
 class SyllabusController {
     async create(req, res, next) {
@@ -19,7 +18,8 @@ class SyllabusController {
             const filePath = path.resolve(__dirname, '..', 'static', fileName);
 
             await syllfile.mv(filePath); 
-            const syllabus = await Syllabus.create({ date, name, syllfile: fileName });
+            const syllabus = new Syllabus({ date, name, syllfile: fileName });
+            await syllabus.save();
 
             return res.json(syllabus);
         } catch (err) {
@@ -30,35 +30,42 @@ class SyllabusController {
 
     async getAll(req, res, next) {
         try {
+            console.log("Received request to get all syllabuses");
             const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {}, year } = req.query;
             const offset = (page - 1) * limit;
             const where = {};
     
             if (search) {
-                where[Op.or] = [
-                    { date: { [Op.like]: `%${search}%` } },
-                    { name: { [Op.like]: `%${search}%` } }
+                where.$or = [
+                    { date: { $regex: search, $options: 'i' } },
+                    { name: { $regex: search, $options: 'i' } }
                 ];
             }
     
             if (year) {
                 where.date = {
-                    [Op.gte]: new Date(`${year}-01-01`),
-                    [Op.lte]: new Date(`${year}-12-31`)
+                    $gte: new Date(`${year}-01-01`),
+                    $lte: new Date(`${year}-12-31`)
                 };
             }
     
-            const syllabuses = await Syllabus.findAndCountAll({
-                where,
-                limit,
-                offset,
-                order: [[sortBy, order]]
-            });
+            for (const key in filter) {
+                if (filter.hasOwnProperty(key)) {
+                    where[key] = filter[key];
+                }
+            }
+    
+            const syllabuses = await Syllabus.find(where)
+                .skip(offset)
+                .limit(limit)
+                .sort({ [sortBy]: order === 'ASC' ? 1 : -1 });
+    
+            const total = await Syllabus.countDocuments(where);
     
             return res.json({
-                total: syllabuses.count,
-                pages: Math.ceil(syllabuses.count / limit),
-                data: syllabuses.rows
+                total: total,
+                pages: Math.ceil(total / limit),
+                data: syllabuses
             });
         } catch (error) {
             console.error('Error retrieving syllabuses:', error);
@@ -73,7 +80,7 @@ class SyllabusController {
             const { date, name } = req.body;
             const syllfile = req.files ? req.files.syllfile : null;
 
-            const syllabus = await Syllabus.findByPk(id);
+            const syllabus = await Syllabus.findById(id);
             if (!syllabus) {
                 return next(ApiError.notFound('Syllabus not found'));
             }
@@ -85,7 +92,11 @@ class SyllabusController {
                 await syllfile.mv(filePath); 
             }
 
-            await syllabus.update({ date, name, syllfile: fileName });
+            syllabus.date = date;
+            syllabus.name = name;
+            syllabus.syllfile = fileName;
+            await syllabus.save();
+
             return res.json({ message: 'Syllabus updated successfully' });
         } catch (err) {
             console.error('Error updating syllabus:', err);
@@ -103,23 +114,23 @@ class SyllabusController {
 
             const isValidDate = !isNaN(Date.parse(query));
             const conditions = {
-                [Op.or]: [
-                    { name: { [Op.like]: `%${query}%` } },
-                    { syllfile: { [Op.like]: `%${query}%` } }
+                $or: [
+                    { name: { $regex: query, $options: 'i' } },
+                    { syllfile: { $regex: query, $options: 'i' } }
                 ]
             };
 
             if (isValidDate) {
                 const date = new Date(query);
-                conditions[Op.or].push({
+                conditions.$or.push({
                     date: {
-                        [Op.gte]: new Date(date.setHours(0, 0, 0, 0)),
-                        [Op.lte]: new Date(date.setHours(23, 59, 59, 999))
+                        $gte: new Date(date.setHours(0, 0, 0, 0)),
+                        $lte: new Date(date.setHours(23, 59, 59, 999))
                     }
                 });
             }
 
-            const syllabuses = await Syllabus.findAll({ where: conditions });
+            const syllabuses = await Syllabus.find(conditions);
 
             if (syllabuses.length === 0) {
                 return next(ApiError.notFound('No syllabus found matching the query'));
@@ -136,7 +147,7 @@ class SyllabusController {
         const { id } = req.params;
 
         try {
-            const syllabus = await Syllabus.findByPk(id);
+            const syllabus = await Syllabus.findById(id);
             if (!syllabus) {
                 return next(ApiError.notFound('Syllabus not found'));
             }
@@ -148,7 +159,7 @@ class SyllabusController {
                 }
             });
 
-            await syllabus.destroy();
+            await syllabus.deleteOne();
             return res.json({ message: 'Syllabus deleted successfully' });
         } catch (error) {
             console.error('Error deleting syllabus:', error);

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Refresh_Token } = require('../models/models');
+const { RefreshToken } = require('../models/models'); 
 
 class TokenService {
     generateToken(payload) {
@@ -18,42 +18,44 @@ class TokenService {
 
     validateRefreshToken(refreshToken) {
         try {
-            const userData = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-            return userData;
+            return jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         } catch (err) {
             return null;
         }
     }
 
-    async saveToken(user_id, refreshToken) {
+    async saveToken(userId, refreshToken) {
         try {
-            const tokenData = await Refresh_Token.findOne({ where: { id_user: user_id } });
+            const tokenData = await RefreshToken.findOne({ id_user: userId });
             if (tokenData) {
                 tokenData.refresh_token = refreshToken;
                 await tokenData.save();
             } else {
-                await Refresh_Token.create({ id_user: user_id, refresh_token: refreshToken });
+                await RefreshToken.create({ id_user: userId, refresh_token: refreshToken });
             }
         } catch (error) {
             console.error("Error saving token:", error);
         }
     }
 
-        async removeToken(refreshToken) {
-            try {
-                const tokenData = await Refresh_Token.destroy({ where: { refresh_token: refreshToken } });
-                console.log("Token removed from database:", tokenData); 
-                return tokenData;
-            } catch (e) {
-                console.error("Error removing token from database:", e);
-                throw e;
-            }
+    async removeToken(refreshToken) {
+        try {
+            const tokenData = await RefreshToken.findOneAndDelete({ refresh_token: refreshToken });
+            console.log("Token removed from database:", tokenData); 
+            return tokenData;
+        } catch (e) {
+            console.error("Error removing token from database:", e);
+            throw e;
         }
-    
-    
+    }
 
     async findToken(refreshToken) {
-        return await Refresh_Token.findOne({ where: { refresh_token: refreshToken } });
+        try {
+            return await RefreshToken.findOne({ refresh_token: refreshToken });
+        } catch (error) {
+            console.error("Error finding token:", error);
+            return null;
+        }
     }
 }
 

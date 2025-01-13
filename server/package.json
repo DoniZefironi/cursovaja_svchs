@@ -19,6 +19,7 @@
     "express-fileupload": "^1.5.1",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.4",
     "mysql2": "^3.11.4",
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",

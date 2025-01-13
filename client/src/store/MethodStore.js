@@ -5,7 +5,7 @@ import {
     createMethod, fetchUserMethodologicals, searchUserMethodologicals,
     createUserMethodological, fetchSpecialityMethodologicals, searchSpecialityMethodologicals,
     createSpecialityMethodological, updateMethod, deleteMethod, downloadMethod
-} from '../api'; // Импортируем функции API
+} from '../api';
 
 class MethodStore {
     methods = [];
@@ -68,11 +68,15 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await fetchMethodsByYear(year, page, 10);
-            this.setMethods(response.data.data);
-            this.setTotalPages(response.data.pages);
-            this.setPage(page);
+            if (response.data && response.data.data) {
+                this.setMethods(response.data.data);
+                this.setTotalPages(response.data.pages);
+                this.setPage(page);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch methods');
+            this.setError(error.response?.data || error.message || 'Failed to fetch methods by year');
         } finally {
             this.setLoading(false);
         }
@@ -82,11 +86,15 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await fetchMethods(page, 10);
-            this.setMethods(response.data.data);
-            this.setTotalPages(response.data.pages);
-            this.setPage(page);
+            if (response.data && response.data.data) {
+                this.setMethods(response.data.data);
+                this.setTotalPages(response.data.pages);
+                this.setPage(page);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch methods');
+            this.setError(error.response?.data || error.message || 'Failed to fetch methods');
         } finally {
             this.setLoading(false);
         }
@@ -96,9 +104,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await fetchMethodologicalById(id);
-            return response.data;
+            if (response.data) {
+                return response.data;
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch method by ID');
+            this.setError(error.response?.data || error.message || 'Failed to fetch method by ID');
         } finally {
             this.setLoading(false);
         }
@@ -108,9 +120,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await fetchSubjects();
-            this.setSubjects(response.data.data);
+            if (response.data && response.data.data) {
+                this.setSubjects(response.data.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch subjects');
+            this.setError(error.response?.data || error.message || 'Failed to fetch subjects');
         } finally {
             this.setLoading(false);
         }
@@ -120,9 +136,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await fetchTypeMethods();
-            this.setTypeMethods(response.data.data);
+            if (response.data && response.data.data) {
+                this.setTypeMethods(response.data.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch type methods');
+            this.setError(error.response?.data || error.message || 'Failed to fetch type methods');
         } finally {
             this.setLoading(false);
         }
@@ -132,13 +152,17 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await fetchUsers();
-            this.setUsers(response.data);
+            if (response.data) {
+                this.setUsers(response.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch users');
+            this.setError(error.response?.data || error.message || 'Failed to fetch users');
         } finally {
             this.setLoading(false);
         }
-    }   
+    }
 
     searchMethods = async () => {
         if (!this.searchQuery) {
@@ -149,9 +173,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await searchMethods(this.searchQuery);
-            this.setMethods(response.data);
+            if (response.data) {
+                this.setMethods(response.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to search methods');
+            this.setError(error.response?.data || error.message || 'Failed to search methods');
         } finally {
             this.setLoading(false);
         }
@@ -161,21 +189,29 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await createMethod(formData);
-            this.setMethods([...this.methods, response.data]);
+            if (response.data) {
+                this.setMethods([...this.methods, response.data]);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to create method');
+            this.setError(error.response?.data || error.message || 'Failed to create method');
         } finally {
             this.setLoading(false);
         }
-    }    
+    }
 
     fetchUserMethodologicals = async () => {
         this.setLoading(true);
         try {
             const response = await fetchUserMethodologicals();
-            return response.data;
+            if (response.data) {
+                return response.data;
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch user methodologicals');
+            this.setError(error.response?.data || error.message || 'Failed to fetch user methodologicals');
             throw error;
         } finally {
             this.setLoading(false);
@@ -186,9 +222,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await searchUserMethodologicals(query);
-            this.setMethods(response.data);
+            if (response.data) {
+                this.setMethods(response.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to search user methodologicals');
+            this.setError(error.response?.data || error.message || 'Failed to search user methodologicals');
         } finally {
             this.setLoading(false);
         }
@@ -198,9 +238,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await createUserMethodological(formData);
-            console.log('UserMethodological created:', response.data);
+            if (response.data) {
+                console.log('UserMethodological created:', response.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to create user methodological');
+            this.setError(error.response?.data || error.message || 'Failed to create user methodological');
         } finally {
             this.setLoading(false);
         }
@@ -210,9 +254,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await fetchSpecialityMethodologicals();
-            return response.data;
+            if (response.data) {
+                return response.data;
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to fetch speciality methodologicals');
+            this.setError(error.response?.data || error.message || 'Failed to fetch speciality methodologicals');
             throw error;
         } finally {
             this.setLoading(false);
@@ -223,9 +271,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await searchSpecialityMethodologicals(query);
-            this.setMethods(response.data);
+            if (response.data) {
+                this.setMethods(response.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to search speciality methodologicals');
+            this.setError(error.response?.data || error.message || 'Failed to search speciality methodologicals');
         } finally {
             this.setLoading(false);
         }
@@ -235,9 +287,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await createSpecialityMethodological(formData);
-            console.log('SpecialityMethodological created:', response.data);
+            if (response.data) {
+                console.log('SpecialityMethodological created:', response.data);
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to create speciality methodological');
+            this.setError(error.response?.data || error.message || 'Failed to create speciality methodological');
         } finally {
             this.setLoading(false);
         }
@@ -247,9 +303,13 @@ class MethodStore {
         this.setLoading(true);
         try {
             const response = await updateMethod(id, formData);
-            this.setMethods(this.methods.map(method => (method.id === id ? response.data : method)));
+            if (response.data) {
+                this.setMethods(this.methods.map(method => (method.id === id ? response.data : method)));
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to update method');
+            this.setError(error.response?.data || error.message || 'Failed to update method');
         } finally {
             this.setLoading(false);
         }
@@ -261,7 +321,7 @@ class MethodStore {
             await deleteMethod(id);
             this.setMethods(this.methods.filter(method => method.id !== id));
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to delete method');
+            this.setError(error.response?.data || error.message || 'Failed to delete method');
         } finally {
             this.setLoading(false);
         }
@@ -274,15 +334,19 @@ class MethodStore {
                 throw new Error('Filename is required for download');
             }
             const response = await downloadMethod(filename);
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', filename);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            if (response.data) {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            } else {
+                throw new Error('Invalid response structure');
+            }
         } catch (error) {
-            this.setError(error.response?.data || 'Failed to download method');
+            this.setError(error.response?.data || error.message || 'Failed to download method');
         } finally {
             this.setLoading(false);
         }

@@ -1,11 +1,12 @@
-const { Form_study } = require('../models/models');
+const { FormStudy } = require('../models/models'); 
 const ApiError = require('../error/ApiError');
 
 class FormStudiesController {
     async create(req, res, next) {
         try {
             const { type } = req.body;
-            const formStudy = await Form_study.create({ type });
+            const formStudy = new FormStudy({ type });
+            await formStudy.save();
             return res.json(formStudy);
         } catch (error) {
             next(ApiError.internal(error.message));
@@ -14,7 +15,7 @@ class FormStudiesController {
 
     async getAll(req, res, next) {
         try {
-            const formStudies = await Form_study.findAll();
+            const formStudies = await FormStudy.find();
             return res.json(formStudies);
         } catch (error) {
             next(ApiError.internal(error.message));
@@ -23,8 +24,8 @@ class FormStudiesController {
 
     async getOne(req, res, next) {
         try {
-            const { id } = req.query;
-            const formStudy = await Form_study.findOne({ where: { id } });
+            const { id } = req.params;
+            const formStudy = await FormStudy.findById(id);
             if (!formStudy) {
                 return next(ApiError.notFound('Form study not found'));
             }
@@ -38,7 +39,7 @@ class FormStudiesController {
         try {
             const { id } = req.params;
             const { type } = req.body;
-            const formStudy = await Form_study.findByPk(id);
+            const formStudy = await FormStudy.findById(id);
             if (!formStudy) {
                 return next(ApiError.notFound('Form study not found'));
             }
@@ -53,11 +54,11 @@ class FormStudiesController {
     async deleteOne(req, res, next) {
         try {
             const { id } = req.params;
-            const formStudy = await Form_study.findByPk(id);
+            const formStudy = await FormStudy.findById(id);
             if (!formStudy) {
                 return next(ApiError.notFound('Form study not found'));
             }
-            await formStudy.destroy();
+            await formStudy.deleteOne();
             return res.json({ message: 'Form study deleted' });
         } catch (error) {
             next(ApiError.internal(error.message));
@@ -67,12 +68,8 @@ class FormStudiesController {
     async search(req, res, next) {
         try {
             const { query } = req.query;
-            const formStudies = await Form_study.findAll({
-                where: {
-                    type: {
-                        [Op.like]: `%${query}%`
-                    }
-                }
+            const formStudies = await FormStudy.find({
+                type: { $regex: query, $options: 'i' } 
             });
             return res.json(formStudies);
         } catch (error) {

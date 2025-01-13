@@ -2,7 +2,7 @@ import { makeAutoObservable } from 'mobx';
 import {
     fetchSpecialities, fetchMethodologicals, createSpecialityMethodological,
     fetchSpecialityMethodologicals, searchSpecialityMethodologicals
-} from '../api'; // Импортируем функции API
+} from '../api'; 
 
 class SpecialityStore {
     specialities = [];

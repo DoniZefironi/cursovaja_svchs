@@ -11,7 +11,9 @@ const UserMethodologicalModal = ({ show, onHide, userMethodologicals = [] }) => 
         {userMethodologicals.length > 0 ? (
           <ul>
             {userMethodologicals.map((um) => (
-              <li key={um.id}>{um.user ? `${um.user.name} ${um.user.surname}` : 'Без имени'} - {um.methodological_rec ? um.methodological_rec.title : 'Без названия'}</li>
+              <li key={um.id}>
+                {um.user ? `${um.user.name} ${um.user.surname}` : 'Без имени'} - {um.methodological_rec ? um.methodological_rec.title : 'Без названия'}
+              </li>
             ))}
           </ul>
         ) : (

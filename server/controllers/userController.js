@@ -1,7 +1,6 @@
 const ApiError = require('../error/ApiError');
 const bcrypt = require('bcrypt');
-const { User } = require('../models/models');
-const { Op } = require('sequelize');
+const { User } = require('../models/models'); 
 const { validationResult } = require('express-validator');
 const userService = require('../service/user-service');
 const tokenService = require('../service/token-service');
@@ -16,15 +15,13 @@ class UserController {
                 return next(ApiError.badRequest('Search query not provided'));
             }
 
-            const users = await User.findAll({
-                where: {
-                    [Op.or]: [
-                        { name: { [Op.like]: `%${query}%` } }, 
-                        { surname: { [Op.like]: `%${query}%` } },
-                        { email: { [Op.like]: `%${query}%` } },
-                        { patronymic: { [Op.like]: `%${query}%` } }
-                    ]
-                }
+            const users = await User.find({
+                $or: [
+                    { name: { $regex: query, $options: 'i' } },
+                    { surname: { $regex: query, $options: 'i' } },
+                    { email: { $regex: query, $options: 'i' } },
+                    { patronymic: { $regex: query, $options: 'i' } }
+                ]
             });
 
             if (users.length === 0) {
@@ -39,53 +36,54 @@ class UserController {
         }
     }
     
-    async getAll(req, res) {
+    async getAll(req, res, next) {
         try {
             console.log("Received request to get all users");
             const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
             const offset = (page - 1) * limit;
             const where = {};
-
+    
             if (search) {
-                where[Op.or] = [
-                    { name: { [Op.like]: `%${search}%` } },
-                    { surname: { [Op.like]: `%${search}%` } },
-                    { email: { [Op.like]: `%${search}%` } },
-                    { patronymic: { [Op.like]: `%${search}%` } }
+                where.$or = [
+                    { name: { $regex: search, $options: 'i' } },
+                    { surname: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { patronymic: { $regex: search, $options: 'i' } }
                 ];
             }
-
+    
             for (const key in filter) {
                 if (filter.hasOwnProperty(key)) {
                     where[key] = filter[key];
                 }
             }
-
-            const users = await User.findAndCountAll({
-                where,
-                limit,
-                offset,
-                order: [[sortBy, order]]
-            });
-
-            console.log("Users retrieved from database:", users.rows);
-
+    
+            const users = await User.find(where)
+                .skip(offset)
+                .limit(limit)
+                .sort({ [sortBy]: order === 'ASC' ? 1 : -1 });
+    
+            const total = await User.countDocuments(where);
+    
+            console.log("Users retrieved from database:", users);
+    
             return res.json({
-                total: users.count,
-                pages: Math.ceil(users.count / limit),
-                data: users.rows
+                total: total,
+                pages: Math.ceil(total / limit),
+                data: users
             });
         } catch (error) {
             console.error('Failed to retrieve users:', error);
-            return res.status(500).json({ error: 'Failed to retrieve users' });
+            return next(ApiError.internal('Failed to retrieve users'));
         }
     }
+    
 
-    async getById(req, res) {
+    async getById(req, res, next) {
         try {
             const { id } = req.params;
             console.log(`Received request to get user by ID: ${id}`);
-            const user = await User.findByPk(id);
+            const user = await User.findById(id);
             if (!user) {
                 console.log(`User not found with ID: ${id}`);
                 return res.status(404).json({ error: 'User not found' });
@@ -94,56 +92,64 @@ class UserController {
             return res.json(user);
         } catch (error) {
             console.error('Failed to retrieve user:', error);
-            return res.status(500).json({ error: 'Failed to retrieve user' });
+            return next(ApiError.internal('Failed to retrieve user'));
         }
     }
 
-    async update(req, res) {
+    async update(req, res, next) {
         try {
             const { id } = req.params;
             const { name, surname, patronymic, email, phone_number, position, roles } = req.body;
 
-            const user = await User.findByPk(id);
+            const user = await User.findById(id);
             if (!user) {
-                return res.status(404).json({ error: 'User not found' });
+                return next(ApiError.notFound('User not found'));
             }
 
-            await user.update({ name, surname, patronymic, email, phone_number, position, roles });
+            user.name = name;
+            user.surname = surname;
+            user.patronymic = patronymic;
+            user.email = email;
+            user.phone_number = phone_number;
+            user.position = position;
+            user.roles = roles;
+            await user.save();
+
             return res.json({ message: 'User updated successfully' });
         } catch (error) {
-            return res.status(500).json({ error: 'Failed to update user' });
+            return next(ApiError.internal('Failed to update user'));
         }
     }
 
-    async delete(req, res) {
+    async delete(req, res, next) {
         try {
             const { id } = req.params;
-            const user = await User.findByPk(id);
+            const user = await User.findById(id);
             if (!user) {
-                return res.status(404).json({ error: 'User not found' });
+                return next(ApiError.notFound('User not found'));
             }
-            await user.destroy();
+            await user.deleteOne();
             return res.json({ message: 'User deleted successfully' });
         } catch (error) {
-            return res.status(500).json({ error: 'Failed to delete user' });
+            return next(ApiError.internal('Failed to delete user'));
         }
     }
 
-    async checkExistence(req, res) {
+    async checkExistence(req, res, next) {
         try {
             const { email } = req.query;
             if (!email) {
                 return res.status(400).json({ error: 'Email is required' });
             }
             console.log(`Checking existence for email: ${email}`);
-            const user = await User.findOne({ where: { email } });
+            const user = await User.findOne({ email });
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
             return res.json({ message: 'User exists' });
         } catch (error) {
             console.error('Error checking user existence:', error);
-            return res.status(500).json({ error: 'Failed to check user existence' });
+            return next(ApiError.internal('Failed to check user existence'));
         }
     }
 

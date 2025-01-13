@@ -1,73 +1,77 @@
-const { Subject } = require('../models/models');
+const { Subject } = require('../models/models'); 
 const ApiError = require('../error/ApiError');
-const { Op } = require('sequelize');
 
 class SubjectController {
-    async create(req, res) {
+    async create(req, res, next) {
         try {
             const { name, description, syllabusId } = req.body;
-            const subject = await Subject.create({ name, description, syllabusId });
+            const subject = new Subject({ name, description, syllabusId });
+            await subject.save();
             return res.json(subject);
         } catch (error) {
             console.error('Failed to create subject:', error);
-            return res.status(500).json({ message: 'Failed to create subject' });
+            return next(ApiError.internal('Failed to create subject'));
         }
     }
 
-    async update(req, res) {
+    async update(req, res, next) {
         try {
             const { id } = req.params;
             const { name, description, syllabusId } = req.body;
-            const subject = await Subject.findByPk(id);
+            const subject = await Subject.findById(id);
             if (!subject) {
-                return res.status(404).json({ message: 'Subject not found' });
+                return next(ApiError.notFound('Subject not found'));
             }
-            await subject.update({ name, description, syllabusId });
+            subject.name = name;
+            subject.description = description;
+            subject.syllabusId = syllabusId;
+            await subject.save();
             return res.json(subject);
         } catch (error) {
             console.error('Failed to update subject:', error);
-            return res.status(500).json({ message: 'Failed to update subject' });
+            return next(ApiError.internal('Failed to update subject'));
         }
     }
 
-    async getAll(req, res) {
+    async getAll(req, res, next) {
         try {
             const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
             const offset = (page - 1) * limit;
             const where = {};
-
+    
             if (search) {
-                where[Op.or] = [
-                    { name: { [Op.like]: `%${search}%` } },
-                    { description: { [Op.like]: `%${search}%` } }
+                where.$or = [
+                    { name: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
                 ];
             }
-
+    
             for (const key in filter) {
                 if (filter.hasOwnProperty(key)) {
                     where[key] = filter[key];
                 }
             }
-
-            const subjects = await Subject.findAndCountAll({
-                where,
-                limit,
-                offset,
-                order: [[sortBy, order]]
-            });
-
-            console.log("Subjects fetched from database:", subjects.rows);
-
+    
+            const subjects = await Subject.find(where)
+                .skip(offset)
+                .limit(limit)
+                .sort({ [sortBy]: order === 'ASC' ? 1 : -1 });
+    
+            const total = await Subject.countDocuments(where);
+    
+            console.log("Subjects fetched from database:", subjects);
+    
             return res.json({
-                total: subjects.count,
-                pages: Math.ceil(subjects.count / limit),
-                data: subjects.rows
+                total: total,
+                pages: Math.ceil(total / limit),
+                data: subjects
             });
         } catch (error) {
-            console.error("Error retrieving subjects:", error);
-            return res.status(500).json({ error: 'Failed to retrieve subjects' });
+            console.error('Error retrieving subjects:', error);
+            return next(ApiError.internal('Failed to retrieve subjects'));
         }
     }
+    
 
     async getOne(req, res, next) {
         const { id } = req.query;
@@ -75,12 +79,16 @@ class SubjectController {
             return next(ApiError.badRequest('ID not provided'));
         }
 
-        const subject = await Subject.findByPk(id);
-        if (!subject) {
-            return next(ApiError.notFound('Subject not found'));
-        }
+        try {
+            const subject = await Subject.findById(id);
+            if (!subject) {
+                return next(ApiError.notFound('Subject not found'));
+            }
 
-        return res.json(subject);
+            return res.json(subject);
+        } catch (error) {
+            return next(ApiError.internal('Failed to retrieve subject'));
+        }
     }
 
     async updateOne(req, res, next) {
@@ -88,12 +96,16 @@ class SubjectController {
             const { id } = req.params;
             const { name, description, syllabusId } = req.body;
 
-            const subject = await Subject.findByPk(id);
+            const subject = await Subject.findById(id);
             if (!subject) {
                 return next(ApiError.notFound('Subject not found'));
             }
 
-            await subject.update({ name, description, syllabusId });
+            subject.name = name;
+            subject.description = description;
+            subject.syllabusId = syllabusId;
+            await subject.save();
+
             return res.json({ message: 'Subject updated successfully' });
         } catch (err) {
             return next(ApiError.internal(err.message));
@@ -108,17 +120,15 @@ class SubjectController {
                 return next(ApiError.badRequest('Search query not provided'));
             }
 
-            const subjects = await Subject.findAll({
-                where: {
-                    [Op.or]: [
-                        { name: { [Op.like]: `%${query}%` } },
-                        { description: { [Op.like]: `%${query}%` } }
-                    ]
-                }
+            const subjects = await Subject.find({
+                $or: [
+                    { name: { $regex: query, $options: 'i' } },
+                    { description: { $regex: query, $options: 'i' } }
+                ]
             });
 
             if (subjects.length === 0) {
-                return res.status(404).json({ message: 'No subjects found matching the query' });
+                return next(ApiError.notFound('No subjects found matching the query'));
             }
 
             console.log("Search results:", subjects);
@@ -129,19 +139,19 @@ class SubjectController {
         }
     }
 
-    async deleteOne(req, res) {
+    async deleteOne(req, res, next) {
         const { id } = req.params;
 
         try {
-            const subject = await Subject.findByPk(id);
+            const subject = await Subject.findById(id);
             if (!subject) {
-                return res.status(404).json({ error: 'Subject not found' });
+                return next(ApiError.notFound('Subject not found'));
             }
 
-            await subject.destroy();
+            await subject.deleteOne();
             return res.json({ message: 'Subject deleted successfully' });
         } catch (error) {
-            return res.status(500).json({ error: 'Failed to delete subject' });
+            return next(ApiError.internal('Failed to delete subject'));
         }
     }
 }

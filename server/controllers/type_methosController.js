@@ -1,44 +1,45 @@
-const { Type_method } = require('../models/models');
+const { TypeMethod } = require('../models/models'); 
 const ApiError = require('../error/ApiError');
-const { Op } = require('sequelize');
 
 class TypeMethodController {
-    async create(req, res) {
+    async create(req, res, next) {
         try {
             const { name } = req.body;
-            const typeMethod = await Type_method.create({ name });
+            const typeMethod = new TypeMethod({ name });
+            await typeMethod.save();
             return res.json(typeMethod);
         } catch (error) {
             console.error('Failed to create type method:', error);
-            return res.status(500).json({ message: 'Failed to create type method' });
+            return next(ApiError.internal('Failed to create type method'));
         }
     }
 
-    async update(req, res) {
+    async update(req, res, next) {
         try {
             const { id } = req.params;
             const { name } = req.body;
-            const typeMethod = await Type_method.findByPk(id);
+            const typeMethod = await TypeMethod.findById(id);
             if (!typeMethod) {
-                return res.status(404).json({ message: 'Type method not found' });
+                return next(ApiError.notFound('Type method not found'));
             }
-            await typeMethod.update({ name });
+            typeMethod.name = name;
+            await typeMethod.save();
             return res.json(typeMethod);
         } catch (error) {
             console.error('Failed to update type method:', error);
-            return res.status(500).json({ message: 'Failed to update type method' });
+            return next(ApiError.internal('Failed to update type method'));
         }
     }
 
-    async getAll(req, res) {
+    async getAll(req, res, next) {
         try {
             const { page = 1, limit = 10, sortBy = 'id', order = 'ASC', search = '', filter = {} } = req.query;
             const offset = (page - 1) * limit;
             const where = {};
 
             if (search) {
-                where[Op.or] = [
-                    { name: { [Op.like]: `%${search}%` } }
+                where.$or = [
+                    { name: { $regex: search, $options: 'i' } }
                 ];
             }
 
@@ -48,21 +49,21 @@ class TypeMethodController {
                 }
             }
 
-            const typeMethods = await Type_method.findAndCountAll({
-                where,
-                limit,
-                offset,
-                order: [[sortBy, order]]
-            });
+            const typeMethods = await TypeMethod.find(where)
+                .skip(offset)
+                .limit(limit)
+                .sort({ [sortBy]: order === 'ASC' ? 1 : -1 });
+
+            const total = await TypeMethod.countDocuments(where);
 
             return res.json({
-                total: typeMethods.count,
-                pages: Math.ceil(typeMethods.count / limit),
-                data: typeMethods.rows
+                total: total,
+                pages: Math.ceil(total / limit),
+                data: typeMethods
             });
         } catch (error) {
             console.error('Failed to retrieve type methods:', error);
-            return res.status(500).json({ message: 'Failed to retrieve type methods' });
+            return next(ApiError.internal('Failed to retrieve type methods'));
         }
     }
 
@@ -72,12 +73,16 @@ class TypeMethodController {
             return next(ApiError.badRequest('ID not provided'));
         }
 
-        const typeMethod = await Type_method.findByPk(id);
-        if (!typeMethod) {
-            return next(ApiError.notFound('Type method not found'));
-        }
+        try {
+            const typeMethod = await TypeMethod.findById(id);
+            if (!typeMethod) {
+                return next(ApiError.notFound('Type method not found'));
+            }
 
-        return res.json(typeMethod);
+            return res.json(typeMethod);
+        } catch (error) {
+            return next(ApiError.internal('Failed to retrieve type method'));
+        }
     }
 
     async updateOne(req, res, next) {
@@ -85,12 +90,13 @@ class TypeMethodController {
             const { id } = req.params;
             const { name } = req.body;
 
-            const typeMethod = await Type_method.findByPk(id);
+            const typeMethod = await TypeMethod.findById(id);
             if (!typeMethod) {
                 return next(ApiError.notFound('Type method not found'));
             }
 
-            await typeMethod.update({ name });
+            typeMethod.name = name;
+            await typeMethod.save();
             return res.json({ message: 'Type method updated successfully' });
         } catch (err) {
             return next(ApiError.internal(err.message));
@@ -104,16 +110,14 @@ class TypeMethodController {
                 return next(ApiError.badRequest('Search query not provided'));
             }
 
-            const typeMethods = await Type_method.findAll({
-                where: {
-                    [Op.or]: [
-                        { name: { [Op.like]: `%${query}%` } }
-                    ]
-                }
+            const typeMethods = await TypeMethod.find({
+                $or: [
+                    { name: { $regex: query, $options: 'i' } }
+                ]
             });
 
             if (typeMethods.length === 0) {
-                return res.status(404).json({ message: 'No type methods found matching the query' });
+                return next(ApiError.notFound('No type methods found matching the query'));
             }
 
             return res.json(typeMethods);
@@ -122,19 +126,19 @@ class TypeMethodController {
         }
     }
 
-    async deleteOne(req, res) {
+    async deleteOne(req, res, next) {
         const { id } = req.params;
 
         try {
-            const typeMethod = await Type_method.findByPk(id);
+            const typeMethod = await TypeMethod.findById(id);
             if (!typeMethod) {
-                return res.status(404).json({ message: 'Type method not found' });
+                return next(ApiError.notFound('Type method not found'));
             }
 
-            await typeMethod.destroy();
+            await typeMethod.deleteOne();
             return res.json({ message: 'Type method deleted successfully' });
         } catch (error) {
-            return res.status(500).json({ message: 'Failed to delete type method' });
+            return next(ApiError.internal('Failed to delete type method'));
         }
     }
 }

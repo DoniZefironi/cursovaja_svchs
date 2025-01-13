@@ -5,7 +5,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './userlist.css';
 import { Context } from '../../index';
 import Search from '../../components/searcuser';
-import Report from '../../components/report';
 import UserList from '../../components/userlist';
 import UserModal from '../../components/usermodal';
 import UserModalCreate from '../../components/usermodalcreate';
@@ -47,7 +46,6 @@ const UserContainer = observer(() => {
     setNewUser({ name: '', surname: '', patronymic: '', email: '', phone_number: '', position: '', roles: '', password: '' });
     window.location.reload();  
 };
-
 
 const handleEdit = () => {
     updateUser(
@@ -117,9 +115,9 @@ const handleEdit = () => {
               {currentUser.user.roles.includes("ADMIN") && ( 
                 <>
                 <h5>Создать преподавателя</h5>
-                          <Button variant="light" onClick={() => setShowCreateModal(true)}>Создать</Button>
+                <Button variant="light" onClick={() => setShowCreateModal(true)}>Создать</Button>
                 </>
-        )}
+              )}
             </div>
           </Col>
         </Row>

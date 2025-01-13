@@ -119,11 +119,19 @@ const MethodContainer = observer(() => {
   };
 
   const handleSelectUser = (userId) => {
-    const formData = { userId: parseInt(userId, 10), methodologicalId: parseInt(selectedMethodId, 10) };
-    createUserMethodological(formData);
-    setShowSelectUserModal(false);
-    setSelectedMethodId(null);
-  };
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('methodologicalId', selectedMethodId);
+    createUserMethodological(formData)
+      .then(() => {
+        setShowSelectUserModal(false);
+        setSelectedMethodId(null);
+      })
+      .catch(error => {
+        console.error('Error creating UserMethodological:', error);
+      });
+};
+
 
   const handleViewUserMethodological = async (methodId) => {
     const userMethodologicals = await fetchUserMethodologicals();
