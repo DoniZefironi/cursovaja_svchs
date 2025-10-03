@@ -1,4 +1,3 @@
-# cursovaja_svchs
-npm run dev - запуск сервера
+## License
 
-npm start - запуск клиента
+Distributed under the MIT License. See `LICENSE` for more information.
